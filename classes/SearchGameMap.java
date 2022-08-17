@@ -15,7 +15,7 @@ public class SearchGameMap {
 
     }
 
-    private LinkedList<GameNode> pathBFS(GameMap map, GameNode start, GameNode end) {
+    public LinkedList<GameNode> pathBFS(GameMap map, GameNode start, GameNode end) {
 
         ArrayDeque<Goal> queue = new ArrayDeque<Goal>();
         HashSet<GameNode> seen = new HashSet<GameNode>(); 

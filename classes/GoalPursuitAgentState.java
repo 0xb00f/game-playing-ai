@@ -30,7 +30,7 @@ public class GoalPursuitAgentState implements AgentState {
 
         // if no pending actions retrieve a goal if one exists to enqueue actions
         if(this.agentEngine.hasGoal()) {
-
+            System.out.println("GOAL MODE: has a goal");
             this.agentEngine.pursueNextBestGoal();
 
             if(this.agentEngine.hasNextAction()) {
@@ -43,7 +43,7 @@ public class GoalPursuitAgentState implements AgentState {
 
         // enqueue a goal and pursue it if there's bombs left to get or territory to explore
         if(this.agentEngine.goalsAvailable()) {
-
+            System.out.println("GOAL MODE: NEXT BEST GOAL");
             this.agentEngine.generateGoal();
             this.agentEngine.pursueNextBestGoal();
             if(this.agentEngine.hasNextAction()) {
@@ -55,10 +55,13 @@ public class GoalPursuitAgentState implements AgentState {
 
         // if no pending goals, change state
         if(this.agentEngine.hasUnexploredLand()) { //conflicts with above logic where its a "goal"?
-             //enable land travel
+            //enable land travel
+            System.out.println("GOAL MODE: changing state to land");
             this.agentEngine.setAgentState(this.agentEngine.exploreLand); //agentstate retrieves goal from gamestate
         }else if(this.agentEngine.hasUnexploredWater()){
             //enable water travel
+            System.out.println("GOAL MODE: changing state to water");
+            this.agentEngine.enableLandTravel();
             this.agentEngine.setAgentState(this.agentEngine.exploreWater);
         }else{
             //panic?

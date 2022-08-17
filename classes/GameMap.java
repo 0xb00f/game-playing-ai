@@ -1,5 +1,6 @@
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class GameMap {
 
@@ -124,7 +125,7 @@ public class GameMap {
 
         }
 
-       printMap();
+       //printMap();
 
     }
 
@@ -183,6 +184,12 @@ public class GameMap {
         neighbours.add(this.map[x][y+1]);
 
         return neighbours;
+
+    }
+
+    public LinkedList<GameNode> reachable(GameNode n) {
+
+        return this.search.pathBFS(this, this.state.currentNode, n);
 
     }
 

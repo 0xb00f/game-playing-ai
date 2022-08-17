@@ -69,14 +69,6 @@ public class GameNode {
 
     }
 
-    /*
-     * SO something happens and we lose the map on s0.in
-     * i think it might have to do with trying to search again
-     * after exploring everything... and then losing orientation
-     * somehow. It's fine up until a point. Find that point and what's going on.
-     * ---moving into a tree or key?? obstacle vs out of bounds logic??
-     */
-
     public boolean outOfBounds(GameState state) {
 
         //THIS WAS FUCKING SO MUCH SHIT UP

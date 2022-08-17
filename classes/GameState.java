@@ -101,35 +101,35 @@ public class GameState {
 
     }
 
-    public boolean hasGoal() {
+    public boolean hasGoal() { //del
 
         return this.pendingGoals.size() > 0;
 
     }
 
     //neater? more logical?
-    public boolean goalsAvailable() {
+    public boolean goalsAvailable() { //del
 
         return this.hasSeenBombs() || this.hasUnexploredLand() || this.hasUnexploredWater();
 
     }
 
     //neater? more logical?
-    public void generateGoal() {
+    public void generateGoal() { //del
 
         Goal g = null;
 
         // exploration first
         if(this.hasUnexploredLand()) { 
-            
+            System.out.println("GOAL GENERATE: unexplored land");
             g = new Goal(this.getNearestLand());
 
         }else if(this.hasUnexploredWater()) { // could trap the agent if its a "puddle", how to avoid? ignroe edge case?
-
+           System.out.println("GOAL GENERATE: unexplored water");
             g = new Goal(this.getNearestWater());
 
         }else if(this.hasSeenBombs()) {
-
+            System.out.println("GOAL GENERATE: unexplored bombs");
             g = new Goal(this.getNearestBomb());
         }
 
@@ -137,7 +137,7 @@ public class GameState {
 
     }
 
-    public boolean shouldPursueBomb() { //revise
+    public boolean shouldPursueBomb() { //del
 
         Goal nextGoal = this.pendingGoals.peek();
 
@@ -147,7 +147,7 @@ public class GameState {
 
     }
 
-    public void enqueueBombGoal() { //revise
+    public void enqueueBombGoal() { //del
 
         if(this.hasSeenBombs()) {
 
@@ -158,7 +158,7 @@ public class GameState {
 
     }
 
-    public void enqueueRaftGoal() { //revise
+    public void enqueueRaftGoal() { //del
 
         if(this.hasSeenRafts()) {
 
@@ -168,13 +168,13 @@ public class GameState {
 
     }
 
-    public Goal getNextGoal() {
+    public Goal getNextGoal() { //del
 
         return this.pendingGoals.poll();
 
     }
 
-    public void addGoal(Goal g) {
+    public void addGoal(Goal g) { //del
 
         this.pendingGoals.add(g);
 
@@ -187,7 +187,7 @@ public class GameState {
     }
 
     //abtracted 
-    public GameNode getNearest(LinkedList<GameNode> list) {
+    public GameNode getNearest(LinkedList<GameNode> list) { //del
 
         GameNode n = null;
         int minDist = 0;
@@ -217,25 +217,25 @@ public class GameState {
 
     }
 
-    public GameNode getNearestRaft() { //revise
+    public GameNode getNearestRaft() { //del
 
         return this.getNearest(this.seenRafts);
 
     }
 
-    public GameNode getNearestBomb() { //what if closest isnt reachable? revise all this logic
+    public GameNode getNearestBomb() { //del
 
         return this.getNearest(this.seenBombs);
 
     }
 
-    public GameNode getNearestLand() {
+    public GameNode getNearestLand() { //del
 
         return this.getNearest(this.unexploredLand);
 
     }
 
-    public GameNode getNearestWater() {
+    public GameNode getNearestWater() { //del
 
         return this.getNearest(this.unexploredWater);
 

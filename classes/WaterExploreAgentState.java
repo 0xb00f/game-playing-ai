@@ -51,6 +51,14 @@ public class WaterExploreAgentState implements AgentState {
 
             this.agentEngine.addGoalActions(g);
 
+            if(this.agentEngine.hasNextAction()) {
+
+                Character c = this.agentEngine.getAgentAction();
+                this.agentEngine.processAction(c);
+                return c;
+    
+            } 
+
         }else{
 
             // if no pending actions, change state

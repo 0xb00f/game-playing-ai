@@ -35,31 +35,31 @@ public class AgentEngine {
 
     }
 
-    public boolean canPursueGoal() {
+    public boolean canPursueGoal() { //del
 
         return this.hasGoal() || this.hasSeenBombs();
 
     }
 
-    public void pursueGoal(GameNode n) {
+    public void pursueGoal(GameNode n) { //del?
 
         this.map.pursueGoal(n);
 
     }
 
-    public boolean hasGoal() {
+    public boolean hasGoal() { //del?
 
         return this.state.hasGoal();
 
     }
 
-    public Goal getNextGoal() {
+    public Goal getNextGoal() { //del?
 
         return this.state.getNextGoal();
 
     }
 
-    public GameNode getNextBestItem() {
+    public GameNode getNextBestItem() { //del
 
         return null; //used for getting seen items for searching dynamically??
 
@@ -131,19 +131,19 @@ public class AgentEngine {
 
     }
 
-    public void addGoalActions(Goal g) {
+    public void addGoalActions(Goal g) { //del
 
         this.actions.goToGoal(g);
 
     }
 
-    public boolean hasUnexploredWater() {
+    public boolean hasUnexploredWater() { //del?
 
         return this.state.hasUnexploredWater();
 
     }
 
-    public boolean hasUnexploredLand() {
+    public boolean hasUnexploredLand() { //del?
 
         return this.state.hasUnexploredLand();
 
@@ -161,52 +161,52 @@ public class AgentEngine {
 
     }
 
-    public boolean hasSeenRafts() {
+    public boolean hasSeenRafts() { //del?
 
         return this.state.hasSeenRafts();
 
     }
 
-    public boolean hasSeenBombs() {
+    public boolean hasSeenBombs() { //del?
 
         return this.state.hasSeenBombs();
 
     }
 
-    public void getNearestBomb() {
+    public void getNearestBomb() { //del
 
         this.state.addGoal(new Goal(this.state.getNearestBomb()));
 
     }
 
-    public void fetchRaft() {
+    public void fetchRaft() { //del
 
         this.state.setRaft(true);
         this.state.enqueueRaftGoal();
 
     }
 
-    public void pursueNextBestGoal() {
+    public void pursueNextBestGoal() { //del
 
         Goal g = this.map.nextBestGoal();
         this.actions.goToGoal(g);
 
     }
 
-    public boolean shouldPursueBomb() { //?
+    public boolean shouldPursueBomb() { //?del
 
         return this.state.shouldPursueBomb();
 
     }
 
-    public boolean goalsAvailable() {
+    public boolean goalsAvailable() { //del
 
         return this.state.goalsAvailable();
 
     }
 
     //neater? more logical?
-    public void generateGoal() {
+    public void generateGoal() { //del
 
         this.state.generateGoal();
 
