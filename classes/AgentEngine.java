@@ -7,6 +7,7 @@ public class AgentEngine {
     private AgentActions actions;
     private GameState state;
     private GameMap map;
+    private GoalManager goalMngr;
 
 
     public AgentEngine() {
@@ -19,6 +20,7 @@ public class AgentEngine {
         this.map = new GameMap(this.state);
         this.actions = new AgentActions(this.state);
         this.currentState = this.exploreLand;
+        this.goalMngr = new GoalManager(this.actions, this.map, this.state);
         
     }
 
@@ -37,12 +39,13 @@ public class AgentEngine {
 
     public boolean canPursueGoal() { //del
 
-        return this.hasGoal() || this.hasSeenBombs();
+        return this.goalMngr.hasPotentialGoals();
 
     }
 
     public void pursueGoal(GameNode n) { //del?
 
+        //this.goalMngr.pursueItem(n);
         this.map.pursueGoal(n);
 
     }
@@ -55,13 +58,8 @@ public class AgentEngine {
 
     public Goal getNextGoal() { //del?
 
+        //
         return this.state.getNextGoal();
-
-    }
-
-    public GameNode getNextBestItem() { //del
-
-        return null; //used for getting seen items for searching dynamically??
 
     }
 

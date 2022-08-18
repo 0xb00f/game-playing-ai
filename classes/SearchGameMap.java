@@ -140,7 +140,7 @@ public class SearchGameMap {
 
     }
 
-    public Goal pursueNextBestGoal(GameMap map) {
+    public Goal pursueNextBestGoal(GameMap map) { //del!!!
 
         Goal g = this.state.getNextGoal();
 

@@ -168,13 +168,25 @@ public class GameState {
 
     }
 
-    public Goal getNextGoal() { //del
+    public Goal peekGoal() {
+
+        return this.pendingGoals.peek();
+
+    }
+
+    public Goal getNextGoal() { //del?? why
 
         return this.pendingGoals.poll();
 
     }
 
-    public void addGoal(Goal g) { //del
+    public void addGoal(Goal g) { //keep this, basic setter
+
+        for(Goal x: this.pendingGoals) {
+
+            if(x.getGoalNode() == g.getGoalNode()) return;
+
+        }
 
         this.pendingGoals.add(g);
 

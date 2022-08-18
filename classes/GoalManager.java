@@ -10,12 +10,14 @@ public class GoalManager {
     private AgentActions actions;
     private GameMap map;
     private GameState state;
+    private Heuristic manhattanDistance;
 
     public GoalManager(AgentActions a, GameMap m, GameState s) {
 
         this.actions = a;
         this.map = m;
         this.state = s;
+        this.manhattanDistance = new ManhattanDistanceHeuristic();
 
     }
 
@@ -65,7 +67,7 @@ public class GoalManager {
 
     public void addGoal(Goal g) {
 
-        this.state.pendingGoals.add(g);
+        this.state.addGoal(g);
 
     }
 
@@ -119,6 +121,7 @@ public class GoalManager {
         if(this.state.hasSeenBombs()) {
 
             GameNode n = this.getNearestBomb();
+            //reachable? dowhile
             this.addGoal(new Goal(n));
 
         }
@@ -128,7 +131,7 @@ public class GoalManager {
     public void enqueueRaftGoal() { //del
 
         if(this.state.hasSeenRafts()) {
-
+            //reachable? dowhile
             this.addGoal(new Goal(this.getNearestRaft()));
 
         }
@@ -137,5 +140,46 @@ public class GoalManager {
 
     //add goal actions
 
+    //let the logic of choosing goals be here, agent engine jsut clicks a button that will somehow pursue a goal
+    /*
+     * 1. click the 'go to a goal' button
+     * 2. if there's a reachable goal ready to go, poll it and go
+     * 3. if no reachable goals on hand, if there are reachable bombs, go for the closest
+     * 4. if nothing, return false, explore more
+     */
+    private boolean pursueGoal() {
+
+        if(this.state.hasGoal()) {
+
+            Goal g = this.state.peekGoal(); //should the queue just be gamenodes? and goals passed to actions?
+            if(this.nodeReachable(g.getGoalNode())) {
+             
+                //Goal g = this.map.pursueGoal(g);
+                //feed to actions
+                //return true
+                
+            }
+
+        }
+
+        if(this.hasPotentialGoals()) {
+
+            //get nearest (reachable!) in order of preference: bombs, land, water
+            //send it off to astar
+            //feed to actions
+            // return true
+
+        }
+
+        return false;
+
+    }
+
+    //late night stoned idea...
+    /*
+     * path-clearing heuristic that, every time a tree or piece of wall or something not
+     * terrain is removed, counts the amount of goals now reachable because of that removed node
+     * if a new item is reachable by removing it, its a lower-cost path! 
+     */
     
 }

@@ -18,11 +18,10 @@ public class GameNode {
 
         switch(this.nodeType) {
 
+            case 'a': case 'k': case 'd': case '$': return -1;
             case ' ': case '~': return 0;
-            case 'a': case 'k': case 'd': return -1;
             case '*': return 1;
             case 'T': return 2;
-            case '$': return 0; 
             default: return 100; //should never happen
 
         }
