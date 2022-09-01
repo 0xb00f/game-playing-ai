@@ -17,7 +17,7 @@ public class Goal {
     }
 
     // THIS IS GOAL WEIGHT, NOT NODE WEIGHT
-    private int calcWeight(GameNode n) {
+    private int calcWeight(GameNode n) { //del?
 
         switch(n.getType()) {
 

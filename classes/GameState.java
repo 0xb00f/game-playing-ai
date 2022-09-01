@@ -6,7 +6,7 @@ import java.util.PriorityQueue;
 
 public class GameState { 
 
-    public PriorityQueue<Goal> pendingGoals; 
+    public PriorityQueue<GameNode> pendingGoals; 
     //public HashMap<Character,ArrayList<GameNode>> seenItems; // BUT there will need to be a priority to these... most important first
     public LinkedList<GameNode> unexploredLand; //used?
     public LinkedList<GameNode> unexploredWater; //used?
@@ -22,12 +22,12 @@ public class GameState {
     public boolean onWater; //?? needs to be some way of ahdnling the logic of terrain
     public HashSet<Character> validTerrain;
 
-    private class GoalCompare implements Comparator<Goal> {
+    private class GoalCompare implements Comparator<GameNode> {
 
-        public int compare(Goal a, Goal b) {
+        public int compare(GameNode a, GameNode b) {
     
-            Integer g1 = a.getWeight();
-            Integer g2 = b.getWeight();
+            Integer g1 = a.goalWeight();
+            Integer g2 = b.goalWeight();
             
             return g1.compareTo(g2);
             
@@ -37,7 +37,7 @@ public class GameState {
 
     public GameState() {
 
-        this.pendingGoals = new PriorityQueue<Goal>(new GoalCompare());
+        this.pendingGoals = new PriorityQueue<GameNode>(new GoalCompare());
         //this.seenItems = new HashMap<Character,ArrayList<GameNode>>(); 
         this.unexploredLand = new LinkedList<GameNode>();
         this.unexploredWater = new LinkedList<GameNode>();
@@ -79,6 +79,8 @@ public class GameState {
 
     public void enableWaterTravel() {
 
+        System.out.println("ENABLING WATER");
+
         this.validTerrain.add('~');
 
     }
@@ -101,92 +103,11 @@ public class GameState {
 
     }
 
-    public boolean hasGoal() { //del
+    public void addGoal(GameNode g) { //keep this, basic setter
 
-        return this.pendingGoals.size() > 0;
+        if(this.pendingGoals.contains(g)) return;
 
-    }
-
-    //neater? more logical?
-    public boolean goalsAvailable() { //del
-
-        return this.hasSeenBombs() || this.hasUnexploredLand() || this.hasUnexploredWater();
-
-    }
-
-    //neater? more logical?
-    public void generateGoal() { //del
-
-        Goal g = null;
-
-        // exploration first
-        if(this.hasUnexploredLand()) { 
-            System.out.println("GOAL GENERATE: unexplored land");
-            g = new Goal(this.getNearestLand());
-
-        }else if(this.hasUnexploredWater()) { // could trap the agent if its a "puddle", how to avoid? ignroe edge case?
-           System.out.println("GOAL GENERATE: unexplored water");
-            g = new Goal(this.getNearestWater());
-
-        }else if(this.hasSeenBombs()) {
-            System.out.println("GOAL GENERATE: unexplored bombs");
-            g = new Goal(this.getNearestBomb());
-        }
-
-        this.addGoal(g);
-
-    }
-
-    public boolean shouldPursueBomb() { //del
-
-        Goal nextGoal = this.pendingGoals.peek();
-
-        if(nextGoal == null) return false;
-
-        return 6 < nextGoal.getWeight();
-
-    }
-
-    public void enqueueBombGoal() { //del
-
-        if(this.hasSeenBombs()) {
-
-            GameNode n = this.getNearestBomb();
-            this.addGoal(new Goal(n));
-
-        }
-
-    }
-
-    public void enqueueRaftGoal() { //del
-
-        if(this.hasSeenRafts()) {
-
-            this.addGoal(new Goal(this.getNearestRaft()));
-
-        }
-
-    }
-
-    public Goal peekGoal() {
-
-        return this.pendingGoals.peek();
-
-    }
-
-    public Goal getNextGoal() { //del?? why
-
-        return this.pendingGoals.poll();
-
-    }
-
-    public void addGoal(Goal g) { //keep this, basic setter
-
-        for(Goal x: this.pendingGoals) {
-
-            if(x.getGoalNode() == g.getGoalNode()) return;
-
-        }
+        System.out.println("ADDING GOAL: '"+g.getType()+"'");
 
         this.pendingGoals.add(g);
 
@@ -198,58 +119,11 @@ public class GameState {
 
     }
 
-    //abtracted 
-    public GameNode getNearest(LinkedList<GameNode> list) { //del
+    public void addSeenRaft(GameNode n) {
 
-        GameNode n = null;
-        int minDist = 0;
+        if(this.seenRafts.contains(n)) return;
 
-        for(GameNode i: list) {
-
-            if(i.isVisited()) continue;
-
-            Point nodePos = i.getPoint();
-            Point currPos = this.getCurrPos();
-            int tmpDist = Math.abs(nodePos.x - currPos.x) + Math.abs(nodePos.y - currPos.y);
-
-            if(tmpDist < minDist) {
-
-                minDist = tmpDist;
-                n = i;
-
-            }
-
-        }
-
-        if(n == null) return null;
-
-        list.remove(n);
-
-        return n;
-
-    }
-
-    public GameNode getNearestRaft() { //del
-
-        return this.getNearest(this.seenRafts);
-
-    }
-
-    public GameNode getNearestBomb() { //del
-
-        return this.getNearest(this.seenBombs);
-
-    }
-
-    public GameNode getNearestLand() { //del
-
-        return this.getNearest(this.unexploredLand);
-
-    }
-
-    public GameNode getNearestWater() { //del
-
-        return this.getNearest(this.unexploredWater);
+        this.seenRafts.add(n);
 
     }
 
@@ -259,17 +133,44 @@ public class GameState {
 
     }
 
+    public void addSeenBomb(GameNode n) {
+
+        if(this.seenBombs.contains(n)) return;
+
+        this.seenBombs.add(n);
+
+    }
+
     public void rememberNode(GameNode n) {
 
         switch(n.getType()) {
 
-            case ' ': if(!n.isVisited()) this.unexploredLand.add(n); break;
-            case '~': if(!n.isVisited()) this.unexploredWater.add(n); break;            
-            case 'T': this.seenRafts.add(n); break;
-            case 'd': this.seenBombs.add(n); break;
-            case 'k': case '$': case 'a': this.pendingGoals.add(new Goal(n)); //what about going home?, duplicates too how is this called
+            case ' ': if(!n.isVisited()) this.addUnexploredLand(n); break;
+            case '~': if(!n.isVisited()) this.addUnexploredWater(n); break;            
+            case 'T': this.addSeenRaft(n); break;
+            case 'd': this.addSeenBomb(n); break;
+            case 'k': case '$': case 'a': this.addGoal(n); break; //what about going home?, duplicates too how is this called
 
         }
+
+    }
+
+    public void cleanUnexplored() {
+
+        LinkedList<GameNode> kill = new LinkedList<GameNode>();
+
+        for(GameNode x : this.unexploredLand) {
+            if(x.isVisited()) kill.add(x);
+        }
+
+        this.unexploredLand.removeAll(kill);
+        kill.clear();
+
+        for(GameNode x : this.unexploredWater) {
+            if(x.isVisited()) kill.add(x);
+        }
+
+        this.unexploredWater.removeAll(kill);
 
     }
 
@@ -280,6 +181,8 @@ public class GameState {
     }
 
     public void addUnexploredWater(GameNode g) {
+
+        if(this.unexploredWater.contains(g)) return;
 
         this.unexploredWater.add(g);
 
@@ -292,6 +195,8 @@ public class GameState {
     }
 
     public void addUnexploredLand(GameNode g) {
+
+        if(this.unexploredLand.contains(g)) return;
 
         this.unexploredLand.add(g);
 
@@ -328,16 +233,6 @@ public class GameState {
     }
 
     public void setRaft(boolean b) {
-
-        if(b) {
-
-            this.enableWaterTravel();
-
-        }else{
-
-            this.disableWaterTravel();
-
-        }
 
         this.raft = b;
 
@@ -402,12 +297,18 @@ public class GameState {
 
         switch(node.getType()) {
 
-            case 'T' : this.setRaft(true); break; //where and when to unset raft?
             case 'k' : this.setKey(); break;
             case 'd' : this.addBomb(); break;
             case 'a' : this.setAxe(); break;
             case '$' : this.setTreasure(); break;
             //default : this.onWater = (node.getType() == '~'); //?
+
+        }
+
+        if(node.isItem()) {
+
+            System.out.println("Removing goal: '"+node.getType()+"'");
+            this.pendingGoals.remove(node);
 
         }
 
@@ -425,29 +326,49 @@ public class GameState {
 
     }
 
+    private void manangeTerrain(char curr, char next) {
+
+        if(curr == '~' && next == ' ') { 
+            this.disableWaterTravel();
+            this.enableLandTravel();
+            this.setRaft(false);
+            this.onWater = false;
+        }else if(curr == ' ' && next == '~') {
+            this.enableWaterTravel();
+            this.disableLandTravel();
+            this.onWater = true;
+        }
+
+    }
+
     // could pass map as a param to this
     public void move(GameNode[][] map) { //bit hacky inlcuding map here, maybe making up for bad logic elsewhere...
 
         GameNode curr = this.currentNode;
         int trueX = curr.getPoint().x;
         int trueY = curr.getPoint().y;
+        char prevType = curr.getType();
 
         switch(this.currentDirection) {
 
             case 0: 
                 this.isBad(map[trueX-1][trueY]);
+                this.manangeTerrain(prevType, map[trueX-1][trueY].getType());
                 this.currentNode = map[trueX-1][trueY];
                 break;
             case 1:
                 this.isBad(map[trueX][trueY+1]);
+                this.manangeTerrain(prevType, map[trueX][trueY+1].getType());
                 this.currentNode = map[trueX][trueY+1];
                 break;
             case 2:
                 this.isBad(map[trueX+1][trueY]);
+                this.manangeTerrain(prevType, map[trueX+1][trueY].getType());
                 this.currentNode = map[trueX+1][trueY];
                 break;
             case 3:
-               this.isBad(map[trueX][trueY-1]);
+                this.isBad(map[trueX][trueY-1]);
+                this.manangeTerrain(prevType, map[trueX][trueY-1].getType());
                 this.currentNode = map[trueX][trueY-1];
                 break;
             default: //debug

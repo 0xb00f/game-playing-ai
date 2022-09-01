@@ -37,6 +37,7 @@ public class GoalManager {
         for(GameNode m: list) {
 
             if(m.isVisited()) continue;
+            if(!this.nodeReachable(m)) continue;
 
             Point nodePos = m.getPoint();
             Point currPos = this.state.getCurrPos();
@@ -65,14 +66,46 @@ public class GoalManager {
 
     }
 
-    public void addGoal(Goal g) {
+    public void addGoal(GameNode g) {
 
         this.state.addGoal(g);
 
     }
 
-    public Goal getNextGoal() {
+    public GameNode getReachable(LinkedList<GameNode> list) { //?
 
+        GameNode n = null;
+
+        for(GameNode m : list) {
+
+            if(this.nodeReachable(m)) {
+                n = m;
+                list.remove(m);
+                break;
+            }
+
+        }
+
+        return n;
+
+    }
+
+    public GameNode getNextGoal() {
+
+        /*
+        GameNode n = null;
+
+        for(GameNode m : this.state.pendingGoals) {
+
+            if(this.nodeReachable(m)) {
+                n = m;
+                this.state.pendingGoals.remove(m);
+                break;
+            }
+
+        }
+
+        return n;*/
         return this.state.pendingGoals.poll();
 
     }
@@ -85,11 +118,6 @@ public class GoalManager {
         return this.state.hasSeenBombs() || this.state.hasUnexploredLand() || this.state.hasUnexploredWater();
 
     }
-
-    //enqueue raft goal
-
-    //enqueue bomb goal
-
     
     public GameNode getNearestRaft() { //del
 
@@ -116,58 +144,57 @@ public class GoalManager {
     }
 
     
-    public void enqueueBombGoal() { //del
+    public boolean enqueueBombGoal() { //del
 
         if(this.state.hasSeenBombs()) {
 
             GameNode n = this.getNearestBomb();
-            //reachable? dowhile
-            this.addGoal(new Goal(n));
+            this.addGoal(n);
+            return true;
 
         }
 
+        return false;
+
     }
 
-    public void enqueueRaftGoal() { //del
+    public boolean enqueueRaftGoal() { //del
 
         if(this.state.hasSeenRafts()) {
-            //reachable? dowhile
-            this.addGoal(new Goal(this.getNearestRaft()));
+
+            this.addGoal(this.getNearestRaft());
+            return true;
 
         }
+
+        return false;
 
     }
 
-    //add goal actions
+    public boolean pursueGoal() {
 
-    //let the logic of choosing goals be here, agent engine jsut clicks a button that will somehow pursue a goal
-    /*
-     * 1. click the 'go to a goal' button
-     * 2. if there's a reachable goal ready to go, poll it and go
-     * 3. if no reachable goals on hand, if there are reachable bombs, go for the closest
-     * 4. if nothing, return false, explore more
-     */
-    private boolean pursueGoal() {
+        GameNode n = null;
 
-        if(this.state.hasGoal()) {
+        if(this.state.hasTreasure() && !this.state.pendingGoals.contains(this.map.getHome())) {
 
-            Goal g = this.state.peekGoal(); //should the queue just be gamenodes? and goals passed to actions?
-            if(this.nodeReachable(g.getGoalNode())) {
-             
-                //Goal g = this.map.pursueGoal(g);
-                //feed to actions
-                //return true
-                
-            }
+            this.addGoal(this.map.getHome());
 
         }
 
-        if(this.hasPotentialGoals()) {
+        if(this.hasGoal()) { 
+            System.out.println("GETTING GOAL");
+            n = this.getNextGoal();
+        } else if(this.state.hasSeenBombs()) { 
+            System.out.println("GETTING BOMB");
+            n = this.getNearestBomb();
+        }
 
-            //get nearest (reachable!) in order of preference: bombs, land, water
-            //send it off to astar
-            //feed to actions
-            // return true
+        if(n != null) {
+
+            System.out.println("GOING FOR GOAL '"+n.getType()+"'");
+            Goal g = this.map.pursueGoal(n);
+            this.actions.goToGoal(g);
+            return true;
 
         }
 

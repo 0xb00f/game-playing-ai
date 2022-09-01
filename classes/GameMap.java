@@ -125,7 +125,8 @@ public class GameMap {
 
         }
 
-       //printMap();
+        this.state.cleanUnexplored();
+        //printMap();
 
     }
 
@@ -158,12 +159,6 @@ public class GameMap {
 
     }
 
-    public Goal nextBestGoal() {
-
-        return this.search.pursueNextBestGoal(this);
-
-    }
-
     // pursue goal - does this return a goal or add it to be retrieved from state?
     public Goal pursueGoal(GameNode n) {
 
@@ -190,6 +185,12 @@ public class GameMap {
     public LinkedList<GameNode> reachable(GameNode n) {
 
         return this.search.pathBFS(this, this.state.currentNode, n);
+
+    }
+
+    public GameNode getHome() {
+
+        return this.map[100][100];
 
     }
 

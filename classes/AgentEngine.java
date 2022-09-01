@@ -26,7 +26,13 @@ public class AgentEngine {
 
     public Character playGame(char[][] view) {
 
-        return this.currentState.doTask(view);
+        this.mapView(view);
+
+        while(!this.hasNextAction()) this.currentState.doTask(view);
+
+        Character c = this.getAgentAction();
+        this.processAction(c);
+        return c;
 
     }
 
@@ -37,29 +43,27 @@ public class AgentEngine {
 
     }
 
-    public boolean canPursueGoal() { //del
+    public boolean pursueGoal() { //del?
 
-        return this.goalMngr.hasPotentialGoals();
-
-    }
-
-    public void pursueGoal(GameNode n) { //del?
-
-        //this.goalMngr.pursueItem(n);
-        this.map.pursueGoal(n);
+        return this.goalMngr.pursueGoal();
 
     }
 
     public boolean hasGoal() { //del?
 
-        return this.state.hasGoal();
+        return this.state.hasTreasure() || this.goalMngr.hasGoal();
 
     }
 
-    public Goal getNextGoal() { //del?
+    public boolean hasTreasure() {
 
-        //
-        return this.state.getNextGoal();
+        return this.state.hasTreasure();
+
+    }
+
+    public GameNode getNextGoal() { //del?
+
+        return this.goalMngr.getNextGoal();
 
     }
 
@@ -147,6 +151,13 @@ public class AgentEngine {
 
     }
 
+    public void enqueueUnexploredLand() {
+
+        GameNode n = this.goalMngr.getNearestLand();
+        this.goalMngr.addGoal(n);
+
+    }
+
     public boolean hasAxe() {
 
         return this.state.hasAxe();
@@ -156,57 +167,6 @@ public class AgentEngine {
     public boolean hasRaft() {
 
         return this.state.hasRaft();
-
-    }
-
-    public boolean hasSeenRafts() { //del?
-
-        return this.state.hasSeenRafts();
-
-    }
-
-    public boolean hasSeenBombs() { //del?
-
-        return this.state.hasSeenBombs();
-
-    }
-
-    public void getNearestBomb() { //del
-
-        this.state.addGoal(new Goal(this.state.getNearestBomb()));
-
-    }
-
-    public void fetchRaft() { //del
-
-        this.state.setRaft(true);
-        this.state.enqueueRaftGoal();
-
-    }
-
-    public void pursueNextBestGoal() { //del
-
-        Goal g = this.map.nextBestGoal();
-        this.actions.goToGoal(g);
-
-    }
-
-    public boolean shouldPursueBomb() { //?del
-
-        return this.state.shouldPursueBomb();
-
-    }
-
-    public boolean goalsAvailable() { //del
-
-        return this.state.goalsAvailable();
-
-    }
-
-    //neater? more logical?
-    public void generateGoal() { //del
-
-        this.state.generateGoal();
 
     }
 

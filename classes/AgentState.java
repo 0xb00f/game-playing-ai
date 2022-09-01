@@ -1,5 +1,5 @@
 public interface AgentState {
     
-    public Character doTask(char[][] view);
+    public void doTask(char[][] view);
 
 }

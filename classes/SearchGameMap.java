@@ -15,6 +15,33 @@ public class SearchGameMap {
 
     }
 
+    public int floodFill(GameMap map) { //node arg for reachability too...
+
+        int nItems = 0;
+        HashSet<GameNode> seen = new HashSet<GameNode>();
+        LinkedList<GameNode> stack = new LinkedList<GameNode>();
+
+        stack.push(this.state.getCurrNode());
+
+        while(!stack.isEmpty()) {
+
+            GameNode curr = stack.pop();
+            seen.add(curr);
+            
+            if(curr.isItem()) nItems++;
+
+            for(GameNode next: map.getNeighbours(curr)) {
+
+                if(!seen.contains(next) && this.state.isValidTerrain(next.getType())) stack.push(next);
+
+            }
+
+        }
+
+        return nItems;
+
+    }
+
     public LinkedList<GameNode> pathBFS(GameMap map, GameNode start, GameNode end) {
 
         ArrayDeque<Goal> queue = new ArrayDeque<Goal>();
@@ -98,6 +125,8 @@ public class SearchGameMap {
 
                     if(seen.contains(n) || n.outOfBounds(this.state)) continue;
 
+                    System.out.println("EXPLORING NODE TYPE '"+n.getType()+"'");
+
                     stack.push(n);
 
                 }
@@ -140,14 +169,6 @@ public class SearchGameMap {
 
     }
 
-    public Goal pursueNextBestGoal(GameMap map) { //del!!!
-
-        Goal g = this.state.getNextGoal();
-
-        return this.astarSearch(map, g.getGoalNode(), new ManhattanDistanceHeuristic());
-
-    }
-
     /*
      * possibly good idea to adapt this to pursue a list of goals, through them, to the last....
      * means adapting heuristic to calculate the lowest cost path through ALL goals... if walls
@@ -180,7 +201,7 @@ public class SearchGameMap {
 
             //if(maxIters == 9999) System.out.println("MaxIters fail");
 
-            for(GoalSearchState x: open) System.out.println("PQ: '"+x.getNode().getType()+"' with weight "+x.getF()+" at "+x.getNode().getPoint().toString());
+            //for(GoalSearchState x: open) System.out.println("PQ: '"+x.getNode().getType()+"' with weight "+x.getF()+" at "+x.getNode().getPoint().toString());
 
             GoalSearchState curr = open.poll();
             System.out.println("ASTAR visiting '"+curr.getNode().getType()+"' at "+curr.getNode().getPoint().toString());

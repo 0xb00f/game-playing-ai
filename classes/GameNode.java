@@ -28,6 +28,21 @@ public class GameNode {
 
     }
 
+    public int goalWeight() {
+
+        switch(this.nodeType) {
+
+            case 'a': return 1;
+            case 'T': return 2;
+            case 'k': return 3;
+            case 'd': return 4;
+            case '$': return 5; 
+            default: return 100;
+
+        }
+
+    }
+
     public Point getPoint() {
 
         return this.pos;
@@ -72,6 +87,10 @@ public class GameNode {
 
         //THIS WAS FUCKING SO MUCH SHIT UP
 
+        /*
+         * exploring water in land mode for some reason
+         */
+
         if(this.isItem()) return false;
 
         switch(this.nodeType) {
@@ -79,11 +98,14 @@ public class GameNode {
             case '.' : return true; 
             case '*' : return true;
             case '-' : return !state.hasKey();
-            case '~' : return !state.hasRaft();
-            default : 
-                return !state.isValidTerrain(this.nodeType);
+            case '~' : case ' ' : return !state.isValidTerrain(this.nodeType);
+            case 'T' : return !state.hasAxe(); //hmmmm
+            //default : 
+                //return !state.isValidTerrain(this.nodeType);
 
         }
+
+        return false; //shouldnt get here but dont want to go wherever triggers this
 
     }
 
@@ -102,13 +124,13 @@ public class GameNode {
 
     }
 
-    public boolean isClearableObstacle() {
+    public boolean isClearableObstacle(GameState state) {
 
         switch(this.nodeType) {
 
-            case '-' : return true;
-            case '*' : return true;
-            case 'T' : return true;
+            case '-' : return state.hasKey();
+            case '*' : return state.hasBomb();
+            case 'T' : return state.hasAxe();
             default : return false;
 
         }

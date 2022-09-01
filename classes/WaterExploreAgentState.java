@@ -8,7 +8,7 @@ public class WaterExploreAgentState implements AgentState {
 
     }
 
-    public Character doTask(char[][] view) {
+    public void doTask(char[][] view) {
 
         System.out.println("IN WATER EXPLORE");
 
@@ -21,50 +21,36 @@ public class WaterExploreAgentState implements AgentState {
          */
 
         // map the current view
-        this.agentEngine.mapView(view);
+        //this.agentEngine.mapView(view);
 
         //enabled water travel in last state...
 
-        // WILL NEED TO FETCH RAFT!!
+        // WILL NEED TO FETCH RAFT!! - update logic
+        /* 
         if(!this.agentEngine.hasRaft() && this.agentEngine.hasSeenRafts()) {
 
             this.agentEngine.fetchRaft();
         
-        }
-        
-        // if pending actions, return next action
-        if(this.agentEngine.hasNextAction()) {
-
-            Character c = this.agentEngine.getAgentAction();
-            this.agentEngine.processAction(c);
-            return c;
-
-        } 
-
-        // enqueue actions to exlpore
-        Goal g = this.agentEngine.exploreWater();
+        }*/
 
         //disable land travel here?
         this.agentEngine.disableLandTravel();
+
+        // enqueue actions to exlpore
+        Goal g = this.agentEngine.exploreWater();
 
         if(g.hasPath()) {
 
             this.agentEngine.addGoalActions(g);
 
-            if(this.agentEngine.hasNextAction()) {
-
-                Character c = this.agentEngine.getAgentAction();
-                this.agentEngine.processAction(c);
-                return c;
-    
-            } 
+            if(this.agentEngine.hasNextAction()) return;
 
         }else{
 
             // if no pending actions, change state
-            if(this.agentEngine.canPursueGoal()) { //or has seen items??
-                //this.agentEngine.setAgentState(this.agentEngine.pursueGoal); //agentstate retrieves goal from gamestate
-                System.exit(1);
+            if(this.agentEngine.hasGoal()) { //or has seen items??
+                this.agentEngine.setAgentState(this.agentEngine.pursueGoal); //agentstate retrieves goal from gamestate
+                //System.exit(1);
             }else if(this.agentEngine.hasUnexploredLand()){
                 System.out.println("GOING INTO LAND EXPLORE MODE");
                 //enable land travel
@@ -78,7 +64,7 @@ public class WaterExploreAgentState implements AgentState {
 
         }
 
-        return this.agentEngine.playGame(view); //get actions from next state
+        return;
 
     }
 

@@ -8,10 +8,10 @@ public class GoalPursuitAgentState implements AgentState {
 
     }
 
-    public Character doTask(char[][] view) {
+    public void doTask(char[][] view) {
 
         // map the current view
-        this.agentEngine.mapView(view);
+        //this.agentEngine.mapView(view);
 
         /*
          * the overall logic should be:
@@ -21,37 +21,8 @@ public class GoalPursuitAgentState implements AgentState {
          * 4. if no goal and nothing yet pursuable, change state, favouring land over water
          */
 
-        // if pending actions, return next action
-        if(this.agentEngine.hasNextAction()) {
-            Character c = this.agentEngine.getAgentAction();
-            this.agentEngine.processAction(c);
-            return c;
-        }
-
         // if no pending actions retrieve a goal if one exists to enqueue actions
-        if(this.agentEngine.hasGoal()) {
-            System.out.println("GOAL MODE: has a goal");
-            this.agentEngine.pursueNextBestGoal();
-
-            if(this.agentEngine.hasNextAction()) {
-                Character c = this.agentEngine.getAgentAction();
-                this.agentEngine.processAction(c);
-                return c;
-            }
-
-        }
-
-        // enqueue a goal and pursue it if there's bombs left to get or territory to explore
-        if(this.agentEngine.goalsAvailable()) {
-            System.out.println("GOAL MODE: NEXT BEST GOAL");
-            this.agentEngine.generateGoal();
-            this.agentEngine.pursueNextBestGoal();
-            if(this.agentEngine.hasNextAction()) {
-                Character c = this.agentEngine.getAgentAction();
-                this.agentEngine.processAction(c);
-                return c;
-            }
-        }
+        if(this.agentEngine.pursueGoal()) return;
 
         // if no pending goals, change state
         if(this.agentEngine.hasUnexploredLand()) { //conflicts with above logic where its a "goal"?
@@ -67,7 +38,7 @@ public class GoalPursuitAgentState implements AgentState {
             //panic?
         }
 
-        return this.agentEngine.playGame(view); //get actions from next state
+        return;
 
     }
 

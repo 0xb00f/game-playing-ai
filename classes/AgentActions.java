@@ -78,7 +78,11 @@ public class AgentActions {
 
         switch(type) {
 
-            case 'T' : this.chopTree(); break;
+            case 'T' : {
+                this.chopTree(); 
+                this.state.setRaft(true);
+                break;
+            }
             case '*' : this.useBomb(); break; //whether items are present and usable will be figured out in astar
             case '-' : this.unlockDoor(); break;
 
@@ -122,11 +126,11 @@ public class AgentActions {
             int nextDir = bearingFrom(prev,next);
             if(nextDir == -1) continue; //should make it so this never happens...
             turnToBearing(nextDir,vdir);
-            if(next.isClearableObstacle()) this.clearObstacle(next.getType());
+            if(next.isClearableObstacle(this.state)) this.clearObstacle(next.getType());
             this.moveForward();
             vdir = nextDir;
             prev = next;
-            System.out.println("GOTOGOAL: next node is '"+next.getType()+"'");
+            //System.out.println("GOTOGOAL: next node is '"+next.getType()+"'");
 
         }
 
