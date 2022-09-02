@@ -22,10 +22,17 @@ public class GoalPursuitAgentState implements AgentState {
          */
 
         // if no pending actions retrieve a goal if one exists to enqueue actions
-        if(this.agentEngine.pursueGoal()) return;
+        
+        if(this.agentEngine.hasAxe() && !this.agentEngine.hasRaft()) {
+
+            if(this.agentEngine.getRaft()) {System.out.println("RAFT SUCCESS"); return;}
+
+        }else if(this.agentEngine.pursueGoal()) {
+            
+            return;
 
         // if no pending goals, change state
-        if(this.agentEngine.hasUnexploredLand()) { //conflicts with above logic where its a "goal"?
+        }else if(this.agentEngine.hasUnexploredLand()) { //conflicts with above logic where its a "goal"?
             //enable land travel
             System.out.println("GOAL MODE: changing state to land");
             this.agentEngine.setAgentState(this.agentEngine.exploreLand); //agentstate retrieves goal from gamestate

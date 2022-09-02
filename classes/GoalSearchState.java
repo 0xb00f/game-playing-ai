@@ -97,9 +97,9 @@ public class GoalSearchState {
                     return false;
                 }
                 
-            case '~': return nextstate.hasRaft();
-            case ' ': return nextstate.isValidTerrain(' '); //what about LEAVING water?
+            case '~': return nextstate.isValidTerrain(next.getType()); ///lookee here...
             case '$': nextstate.setTreasure(); return true;
+            case ' ' : return true;
             default : return false;
 
 

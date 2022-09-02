@@ -95,9 +95,9 @@ public class SearchGameMap {
             prev = curr;
         }
 
-        System.out.println("CONST PATH:");
-        for(GameNode x: g.getPath()) System.out.print(x.getType()+",");
-        System.out.println("");
+        //System.out.println("CONST PATH:");
+        //for(GameNode x: g.getPath()) System.out.print(x.getType()+",");
+        //System.out.println("");
         return g;
 
     }
@@ -125,7 +125,7 @@ public class SearchGameMap {
 
                     if(seen.contains(n) || n.outOfBounds(this.state)) continue;
 
-                    System.out.println("EXPLORING NODE TYPE '"+n.getType()+"'");
+                    //System.out.println("EXPLORING NODE TYPE '"+n.getType()+"'");
 
                     stack.push(n);
 
@@ -218,7 +218,7 @@ public class SearchGameMap {
                     curr = curr.getPrev();   
 
                 }
-
+                System.out.println("ASTAR SUCCESS");
                 Goal g = new Goal(end);
                 g.extendPath(path);
                 return g;

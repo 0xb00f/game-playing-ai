@@ -28,8 +28,10 @@ public class AgentEngine {
 
         this.mapView(view);
 
-        while(!this.hasNextAction()) this.currentState.doTask(view);
-
+        if(!this.hasNextAction()) {
+            while(!this.hasNextAction()) this.currentState.doTask(view);
+        }
+        
         Character c = this.getAgentAction();
         this.processAction(c);
         return c;
@@ -167,6 +169,12 @@ public class AgentEngine {
     public boolean hasRaft() {
 
         return this.state.hasRaft();
+
+    }
+
+    public boolean getRaft() {
+
+        return this.goalMngr.getRaft();
 
     }
 

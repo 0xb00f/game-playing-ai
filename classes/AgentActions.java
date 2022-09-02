@@ -74,13 +74,15 @@ public class AgentActions {
 
     }
 
-    private void clearObstacle(char type) {
+    private void clearObstacle(GameNode n) {
 
-        switch(type) {
+        switch(n.getType()) {
 
             case 'T' : {
                 this.chopTree(); 
                 this.state.setRaft(true);
+                this.state.enableWaterTravel();
+                this.state.seenRafts.remove(n);
                 break;
             }
             case '*' : this.useBomb(); break; //whether items are present and usable will be figured out in astar
@@ -126,7 +128,7 @@ public class AgentActions {
             int nextDir = bearingFrom(prev,next);
             if(nextDir == -1) continue; //should make it so this never happens...
             turnToBearing(nextDir,vdir);
-            if(next.isClearableObstacle(this.state)) this.clearObstacle(next.getType());
+            if(next.isClearableObstacle(this.state)) this.clearObstacle(next);
             this.moveForward();
             vdir = nextDir;
             prev = next;

@@ -308,6 +308,7 @@ public class GameState {
         if(node.isItem()) {
 
             System.out.println("Removing goal: '"+node.getType()+"'");
+            if(node.getType() == 'd') this.seenBombs.remove(node);
             this.pendingGoals.remove(node);
 
         }

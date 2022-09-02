@@ -32,12 +32,13 @@ public class GoalManager {
     public GameNode getNearest(LinkedList<GameNode> list) {
 
         GameNode n = null;
-        int minDist = 0;
+        int minDist = 500;
 
         for(GameNode m: list) {
 
-            if(m.isVisited()) continue;
-            if(!this.nodeReachable(m)) continue;
+            if(!this.nodeReachable(m)) { 
+                continue;
+            }
 
             Point nodePos = m.getPoint();
             Point currPos = this.state.getCurrPos();
@@ -121,13 +122,16 @@ public class GoalManager {
     
     public GameNode getNearestRaft() { //del
 
-        return this.getNearest(this.state.seenRafts);
+        GameNode n = this.getNearest(this.state.seenRafts);
+
+        return n;
 
     }
 
     public GameNode getNearestBomb() { //del
 
-        return this.getNearest(this.state.seenBombs);
+        GameNode n = this.getNearest(this.state.seenBombs);
+        return n;
 
     }
 
@@ -158,16 +162,19 @@ public class GoalManager {
 
     }
 
-    public boolean enqueueRaftGoal() { //del
+    public boolean getRaft() { //del
 
-        if(this.state.hasSeenRafts()) {
+        GameNode n = this.getNearestRaft();
+        Goal g = this.map.pursueGoal(n);
 
-            this.addGoal(this.getNearestRaft());
-            return true;
-
+        if(g != null) {
+            System.out.println("GOING FOR RAFT");
+            this.actions.goToGoal(g);
+        }else{
+            return false;
         }
 
-        return false;
+        return true;
 
     }
 
@@ -182,9 +189,9 @@ public class GoalManager {
         }
 
         if(this.hasGoal()) { 
-            System.out.println("GETTING GOAL");
             n = this.getNextGoal();
-        } else if(this.state.hasSeenBombs()) { 
+            System.out.println("GETTING GOAL '"+n.getType()+"'");
+        }else if(this.state.hasSeenBombs()) { 
             System.out.println("GETTING BOMB");
             n = this.getNearestBomb();
         }
@@ -193,12 +200,11 @@ public class GoalManager {
 
             System.out.println("GOING FOR GOAL '"+n.getType()+"'");
             Goal g = this.map.pursueGoal(n);
-            this.actions.goToGoal(g);
-            return true;
+            if(g != null) this.actions.goToGoal(g);
 
         }
 
-        return false;
+        return n != null;
 
     }
 
