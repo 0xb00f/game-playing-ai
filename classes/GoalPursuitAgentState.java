@@ -10,24 +10,12 @@ public class GoalPursuitAgentState implements AgentState {
 
     public void doTask(char[][] view) {
 
-        // map the current view
-        //this.agentEngine.mapView(view);
-
-        /*
-         * the overall logic should be:
-         * 1. if there's an action to return, we're not done with the previous task, so return the action
-         * 2. if there's a goal to pursue, pursue it and return next action
-         * 3. if there's no goal, check for items or unexplored territory, and pursue it, return an action
-         * 4. if no goal and nothing yet pursuable, change state, favouring land over water
-         */
+        if(this.agentEngine.hasAxe() && !this.agentEngine.hasRaft() && this.agentEngine.getRaft()) {
+            return;
+        }
 
         // if no pending actions retrieve a goal if one exists to enqueue actions
-        
-        if(this.agentEngine.hasAxe() && !this.agentEngine.hasRaft()) {
-
-            if(this.agentEngine.getRaft()) {System.out.println("RAFT SUCCESS"); return;}
-
-        }else if(this.agentEngine.pursueGoal()) {
+        if(this.agentEngine.pursueGoal()) {
             
             return;
 

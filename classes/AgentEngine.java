@@ -8,6 +8,7 @@ public class AgentEngine {
     private GameState state;
     private GameMap map;
     private GoalManager goalMngr;
+    private TerrainManager terrMngr;
 
 
     public AgentEngine() {
@@ -15,12 +16,15 @@ public class AgentEngine {
         this.exploreLand = new LandExploreAgentState(this);
         this.exploreWater = new WaterExploreAgentState(this);
         this.pursueGoal = new GoalPursuitAgentState(this);
+        this.currentState = this.exploreLand;
         this.state = new GameState(); 
-        this.state.enableLandTravel(); //starting out on land
+        this.state.setAgentState(this.currentState);
         this.map = new GameMap(this.state);
         this.actions = new AgentActions(this.state);
-        this.currentState = this.exploreLand;
         this.goalMngr = new GoalManager(this.actions, this.map, this.state);
+        this.terrMngr = new TerrainManager(this.state, this.exploreLand, this.exploreWater, this.pursueGoal);
+        this.state.setTerrainManager(this.terrMngr);
+        this.state.enableLandTravel(); //starting out on land
         
     }
 
@@ -33,15 +37,15 @@ public class AgentEngine {
         }
         
         Character c = this.getAgentAction();
-        this.processAction(c);
+        this.state.processAction(c,this.map);
         return c;
 
     }
 
     public void setAgentState(AgentState newState) {
 
-        //System.out.println("!!!!!!!!!!!!!!!CHANGING STATE!!");
         this.currentState = newState;
+        this.state.setAgentState(newState);
 
     }
 
@@ -123,15 +127,17 @@ public class AgentEngine {
 
     }
 
-    public void processAction(Character c) {
+    public void processAction(Character c) { //delete, moved
 
+        /*  
         switch(c) {
-            case 'f': this.state.move(this.map.getMap()); break;
+            case 'f': this.state.move(this.map.getMap()); break; //this.terrMngr.processTerrainChange(this.state.move(this.map.getMap()));
             case 'l': this.state.turnDirection(-1); break;
             case 'r': this.state.turnDirection(1); break;
             case 'b': this.state.useBomb(); break;
-            default: return; //worry about unmapping the door? or will this be done automatically?
-        }
+            //case 'c' : this.terrMngr.axeCollected(); break;
+            default: return; 
+        }*/
 
     }
 
@@ -143,13 +149,13 @@ public class AgentEngine {
 
     public boolean hasUnexploredWater() { //del?
 
-        return this.state.hasUnexploredWater();
+        return this.state.hasUnexploredWater(this.map);
 
     }
 
     public boolean hasUnexploredLand() { //del?
 
-        return this.state.hasUnexploredLand();
+        return this.state.hasUnexploredLand(this.map);
 
     }
 
@@ -175,6 +181,24 @@ public class AgentEngine {
     public boolean getRaft() {
 
         return this.goalMngr.getRaft();
+
+    }
+
+    public boolean isOnWater() {
+
+        return this.state.isOnWater(); //isOnWater()
+
+    }
+
+    public boolean goToWater() {
+
+        return this.goalMngr.goToWater();
+
+    }
+
+    public boolean goToLand() {
+
+        return this.goalMngr.goToLand();
 
     }
 

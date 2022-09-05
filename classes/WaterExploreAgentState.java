@@ -8,33 +8,14 @@ public class WaterExploreAgentState implements AgentState {
 
     }
 
+    /*
+     * THINK ABOUT OVERALL LOGIC HERE
+     * - want to make sure on water once we begin here...
+     */
+
     public void doTask(char[][] view) {
 
-        System.out.println("IN WATER EXPLORE");
-
-        /*
-         * think about this. 
-         * At first it will be encessary to have both water and aldn as valid terrain as it may need to 
-         * transition from one to the other. After it is on water, though, in this mode it should
-         * disable land travel.
-         * ALSO MUST UNSET RAFT ONCE AGENT LEAVES WATER
-         */
-
-        // map the current view
-        //this.agentEngine.mapView(view);
-
-        //enabled water travel in last state...
-
-        // WILL NEED TO FETCH RAFT!! - update logic
-        /* 
-        if(!this.agentEngine.hasRaft() && this.agentEngine.hasSeenRafts()) {
-
-            this.agentEngine.fetchRaft();
-        
-        }*/
-
-        //disable land travel here?
-        this.agentEngine.disableLandTravel();
+        System.out.println("IN WATER EXPLORE, onwater="+this.agentEngine.isOnWater());
 
         // enqueue actions to exlpore
         Goal g = this.agentEngine.exploreWater();
@@ -47,11 +28,22 @@ public class WaterExploreAgentState implements AgentState {
 
         }else{
 
+            System.out.println("WATER EXPLORE FAIL: explore has no path");
+
             // if no pending actions, change state
-            if(this.agentEngine.hasGoal()) { //or has seen items??
+            if(this.agentEngine.hasGoal() || this.agentEngine.hasTreasure()) { //or has seen items??
+                System.out.println("GOING INTO GOAL PURSUIT MODE");
                 this.agentEngine.setAgentState(this.agentEngine.pursueGoal); //agentstate retrieves goal from gamestate
                 //System.exit(1);
             }else if(this.agentEngine.hasUnexploredLand()){
+                if(this.agentEngine.isOnWater()) {
+
+                    System.out.println("GOIGN TO LAND");
+                    // go to nearest unexplored
+                    this.agentEngine.enableLandTravel();
+                    this.agentEngine.goToLand();
+        
+                }
                 System.out.println("GOING INTO LAND EXPLORE MODE");
                 //enable land travel
                 this.agentEngine.setAgentState(this.agentEngine.exploreLand);

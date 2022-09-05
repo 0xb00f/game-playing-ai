@@ -96,10 +96,14 @@ public class GoalSearchState {
                 }else{
                     return false;
                 }
-                
-            case '~': return nextstate.isValidTerrain(next.getType()); ///lookee here...
-            case '$': nextstate.setTreasure(); return true;
-            case ' ' : return true;
+            case '~' : return nextstate.hasRaft(); //changed these after terrain mngr.... might wanna come back, clone if probs
+            case ' ' : {
+                if(nextstate.isOnWater()) {
+                    nextstate.setRaft(false);
+                }
+                return true; //if onwater, disable raft, return true
+            }
+            case '$' : nextstate.setTreasure(); return true;
             default : return false;
 
 

@@ -15,24 +15,35 @@ public class SearchGameMap {
 
     }
 
-    public int floodFill(GameMap map) { //node arg for reachability too...
+    public int floodFill(GameMap map, GameNode node) { //node arg for reachability too...
 
         int nItems = 0;
         HashSet<GameNode> seen = new HashSet<GameNode>();
-        LinkedList<GameNode> stack = new LinkedList<GameNode>();
+        ArrayDeque<GameNode> q = new ArrayDeque<GameNode>();
 
-        stack.push(this.state.getCurrNode());
+        q.push(this.state.getCurrNode());
 
-        while(!stack.isEmpty()) {
+        //System.out.println("FLOODFILL: looking for node '"+node.getType()+"'");
 
-            GameNode curr = stack.pop();
+        while(!q.isEmpty()) {
+
+            GameNode curr = q.poll();
             seen.add(curr);
             
-            if(curr.isItem()) nItems++;
+            if(node == null && curr.isItem()) nItems++;
+            if(curr == node) {
+                
+                //System.out.println("NODE OF TYPE '"+node.getType()+"' REACHABLE");
+                return 1;
 
+            }
+            
             for(GameNode next: map.getNeighbours(curr)) {
 
-                if(!seen.contains(next) && this.state.isValidTerrain(next.getType())) stack.push(next);
+                if(!seen.contains(next)) {
+                    if(node != null && (node.getType() == next.getType() || this.state.isValidTerrain(next.getType()))) q.add(next);
+                    if(next.isItem() || (this.state.hasAxe() && next.isTree())) q.add(next);
+                }
 
             }
 
@@ -102,7 +113,7 @@ public class SearchGameMap {
 
     }
 
-    public Goal exploreDFS(GameMap map) { 
+    public Goal exploreDFS(GameMap map, char terrain) { 
 
         ArrayDeque<GameNode> stack = new ArrayDeque<GameNode>();
         HashSet<GameNode> seen = new HashSet<GameNode>(); 
@@ -123,9 +134,11 @@ public class SearchGameMap {
 
                 for(GameNode n : map.getNeighbours(curr)) {
 
+                    //System.out.println("EXPLORE: checking node of type '"+n.getType()+"' outofbounds="+n.outOfBounds(this.state));
+
                     if(seen.contains(n) || n.outOfBounds(this.state)) continue;
 
-                    //System.out.println("EXPLORING NODE TYPE '"+n.getType()+"'");
+                    System.out.println("EXPLORING NODE TYPE '"+n.getType()+"'");
 
                     stack.push(n);
 
@@ -177,7 +190,7 @@ public class SearchGameMap {
     
     public Goal astarSearch(GameMap map, GameNode end, Heuristic h) {
 
-        System.out.println("ASTAR: start on goal with type '"+end.getType()+"'");
+        System.out.println("ASTAR: start on goal with type '"+end.getType()+"' at "+end.getPoint().toString());
 
         PriorityQueue<GoalSearchState> open = new PriorityQueue<GoalSearchState>(new GoalStateCompare());
         HashSet<GameNode> closed = new HashSet<GameNode>();
@@ -204,7 +217,7 @@ public class SearchGameMap {
             //for(GoalSearchState x: open) System.out.println("PQ: '"+x.getNode().getType()+"' with weight "+x.getF()+" at "+x.getNode().getPoint().toString());
 
             GoalSearchState curr = open.poll();
-            System.out.println("ASTAR visiting '"+curr.getNode().getType()+"' at "+curr.getNode().getPoint().toString());
+            //System.out.println("ASTAR visiting '"+curr.getNode().getType()+"' at "+curr.getNode().getPoint().toString());
             closed.add(curr.getNode());
 
             // we're at the goal 

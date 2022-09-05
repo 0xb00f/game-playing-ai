@@ -32,16 +32,18 @@ public class GoalManager {
     public GameNode getNearest(LinkedList<GameNode> list) {
 
         GameNode n = null;
-        int minDist = 500;
+        int minDist = Integer.MAX_VALUE;
 
         for(GameNode m: list) {
 
-            if(!this.nodeReachable(m)) { 
+            if(!this.map.isReachable(m)) { 
                 continue;
             }
 
+            //System.out.println("REACHABLE NODE OF TYPE'"+m.getType()+" FOUND");
+
             Point nodePos = m.getPoint();
-            Point currPos = this.state.getCurrPos();
+            Point currPos = this.state.getCurrNode().getPoint();
             int tmpDist = Math.abs(nodePos.x - currPos.x) + Math.abs(nodePos.y - currPos.y);
 
             if(tmpDist < minDist) {
@@ -116,7 +118,7 @@ public class GoalManager {
     //goals available
     public boolean hasPotentialGoals() {
 
-        return this.state.hasSeenBombs() || this.state.hasUnexploredLand() || this.state.hasUnexploredWater();
+        return this.state.hasSeenBombs() || this.state.hasUnexploredLand(this.map) || this.state.hasUnexploredWater(this.map);
 
     }
     
@@ -178,6 +180,38 @@ public class GoalManager {
 
     }
 
+    public boolean goToWater() {
+
+        GameNode n = this.getNearestWater();
+        Goal g = this.map.pursueGoal(n);
+
+        if(g != null) {
+            System.out.println("GOING TO WATER");
+            this.actions.goToGoal(g);
+        }else{
+            return false;
+        }
+
+        return true;
+
+    }
+
+    public boolean goToLand() {
+
+        GameNode n = this.getNearestLand();
+        Goal g = this.map.pursueGoal(n);
+
+        if(g != null) {
+            System.out.println("GOING TO LAND");
+            this.actions.goToGoal(g);
+        }else{
+            return false;
+        }
+
+        return true;
+
+    }
+
     public boolean pursueGoal() {
 
         GameNode n = null;
@@ -200,7 +234,9 @@ public class GoalManager {
 
             System.out.println("GOING FOR GOAL '"+n.getType()+"'");
             Goal g = this.map.pursueGoal(n);
-            if(g != null) this.actions.goToGoal(g);
+            if(g != null) {
+                this.actions.goToGoal(g);
+            }
 
         }
 

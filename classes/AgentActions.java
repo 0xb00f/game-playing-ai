@@ -78,17 +78,13 @@ public class AgentActions {
 
         switch(n.getType()) {
 
-            case 'T' : {
-                this.chopTree(); 
-                this.state.setRaft(true);
-                this.state.enableWaterTravel();
-                this.state.seenRafts.remove(n);
-                break;
-            }
-            case '*' : this.useBomb(); break; //whether items are present and usable will be figured out in astar
+            case 'T' : this.chopTree(); break;
+            case '*' : this.useBomb(); break; 
             case '-' : this.unlockDoor(); break;
 
         }
+
+        n.clearNode();
 
     }
 
@@ -126,13 +122,12 @@ public class AgentActions {
         for(GameNode next : g.getPath()) { 
 
             int nextDir = bearingFrom(prev,next);
-            if(nextDir == -1) continue; //should make it so this never happens...
+            if(nextDir == -1) continue; //ought never to happen
             turnToBearing(nextDir,vdir);
             if(next.isClearableObstacle(this.state)) this.clearObstacle(next);
             this.moveForward();
             vdir = nextDir;
             prev = next;
-            //System.out.println("GOTOGOAL: next node is '"+next.getType()+"'");
 
         }
 

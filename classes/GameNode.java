@@ -3,13 +3,13 @@ import java.awt.Point;
 public class GameNode {
 
     private Point pos;
-    private char nodeType; //or enum class?
+    private char nodeType; 
     private boolean visited;
 
     public GameNode(int x, int y) {
 
         this.pos = new Point(x,y);
-        this.nodeType = '.'; //default out of bounds until otherwise mapped
+        this.nodeType = '.'; 
         this.visited = false;
 
     }
@@ -18,9 +18,10 @@ public class GameNode {
 
         switch(this.nodeType) {
 
-            case 'a': case 'k': case 'd': case '$': return -1;
-            case ' ': case '~': return 0;
-            case '*': return 1;
+            case '$' : return -5;
+            case 'a': case 'k': case 'd': return -1;
+            case ' ': case '~': return 1;
+            case '*': return 2;
             case 'T': return 2;
             default: return 100; //should never happen
 
@@ -65,7 +66,6 @@ public class GameNode {
     // set visited
     public void setVisited() {
 
-        // clear node?
         this.visited = true;
 
     }
@@ -85,12 +85,6 @@ public class GameNode {
 
     public boolean outOfBounds(GameState state) {
 
-        //THIS WAS FUCKING SO MUCH SHIT UP
-
-        /*
-         * exploring water in land mode for some reason
-         */
-
         if(this.isItem()) return false;
 
         switch(this.nodeType) {
@@ -98,14 +92,11 @@ public class GameNode {
             case '.' : return true; 
             case '*' : return true;
             case '-' : return !state.hasKey();
-            case '~' : case ' ' : return !state.isValidTerrain(this.nodeType);
-            case 'T' : return !state.hasAxe(); //hmmmm
-            //default : 
-                //return !state.isValidTerrain(this.nodeType);
+            case '~' : case ' ' : return state.isValidTerrain(this.nodeType) == false;
 
         }
 
-        return false; //shouldnt get here but dont want to go wherever triggers this
+        return true; //shouldnt get here but dont want to go wherever triggers this
 
     }
 
@@ -113,14 +104,16 @@ public class GameNode {
 
         switch(this.nodeType) {
 
-            case 'k' : return true;
-            case 'a' : return true;
-            case 'd' : return true;
-            case '$' : return true;
-            //case 'T' : return true; //this fucked it.. or is it an item?
+            case 'k' : case 'a' : case 'd' : case '$' : return true;
             default : return false;
 
         }
+
+    }
+
+    public boolean isTree() {
+
+        return this.nodeType == 'T';
 
     }
 

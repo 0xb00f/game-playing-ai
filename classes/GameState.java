@@ -1,4 +1,3 @@
-import java.awt.Point;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -19,8 +18,10 @@ public class GameState {
     public int numBombs;
     public GameNode currentNode;
     public int currentDirection; // 0=north, 1=east, 2=south, 3=west
-    public boolean onWater; //?? needs to be some way of ahdnling the logic of terrain
-    public HashSet<Character> validTerrain;
+    public boolean onWater; //moved... but should I? for purposes of cloning...
+    public HashSet<Character> validTerrain; //moved
+    private AgentState currAgentState;
+    private TerrainManager terrMngr;
 
     private class GoalCompare implements Comparator<GameNode> {
 
@@ -50,56 +51,88 @@ public class GameState {
         this.numBombs = 0;
         this.currentNode = null; // filled in mapView
         this.currentDirection = 0; // north by default
-        this.validTerrain = new HashSet<Character>();
-        //this.enableLandTravel(); //messes with cloning?
+        this.validTerrain = new HashSet<Character>(); //moved
+        this.terrMngr = null;
+        this.currAgentState = null;
 
     }
 
     public GameState cloneState(GameNode n) {
 
         GameState clonedState = new GameState();
+        clonedState.setAgentState(this.currAgentState);
         clonedState.axe = this.hasAxe();
         clonedState.raft = this.hasRaft();
         clonedState.key = this.hasKey();
         clonedState.treasure = this.hasTreasure();
         clonedState.numBombs = this.getNumBombs();
         clonedState.currentDirection = this.getDirection();
-        clonedState.validTerrain.addAll(this.validTerrain);
+        clonedState.validTerrain.addAll(this.validTerrain); //change for terrMngr......?
         clonedState.currentNode = n; 
-
+        
         return clonedState;
+
+    }
+
+    public void setTerrainManager(TerrainManager t) {
+
+        this.terrMngr = t;
+
+    }
+
+    public void setAgentState(AgentState s) {
+
+        this.currAgentState = s;
+
+    }
+
+    public void processAction(Character c, GameMap m) {
+
+        switch(c) {
+
+            case 'f': this.move(m); break;
+            case 'l': this.turnDirection(-1); break;
+            case 'r': this.turnDirection(1); break;
+            case 'b': this.useBomb(); break;
+            case 'c': this.terrMngr.raftCollected(); break;
+
+        }
 
     }
 
     public boolean isValidTerrain(char c) {
 
-        return this.validTerrain.contains(c);
+        return this.terrMngr.isValidTerrain(this.currAgentState,c);
+        //return this.validTerrain.contains(c);
 
     }
 
-    public void enableWaterTravel() {
+    public void enableWaterTravel() { //edit
 
-        System.out.println("ENABLING WATER");
-
-        this.validTerrain.add('~');
-
-    }
-
-    public void enableLandTravel() {
-
-        this.validTerrain.add(' ');
+        //System.out.println("ENABLING WATER");
+        this.terrMngr.enableWaterTravel();
+        //this.validTerrain.add('~');
 
     }
 
-    public void disableWaterTravel() {
+    public void enableLandTravel() { //edit
 
-        this.validTerrain.remove('~');
+        //this.validTerrain.add(' ');
+        this.terrMngr.enableLandTravel();
 
     }
 
-    public void disableLandTravel() {
+    public void disableWaterTravel() { //edit
 
-        this.validTerrain.remove(' ');
+        //this.validTerrain.remove('~');
+        this.terrMngr.disableWaterTravel();
+
+    }
+
+    public void disableLandTravel() { //edit
+
+        //this.validTerrain.remove(' ');
+        this.terrMngr.disableLandTravel();
 
     }
 
@@ -174,9 +207,24 @@ public class GameState {
 
     }
 
-    public boolean hasUnexploredWater() {
+    public boolean hasUnexploredWater(GameMap map) {
 
-        return this.unexploredWater.size() > 0;
+        boolean ret = false;
+
+        if(!this.onWater) this.enableWaterTravel(); //? as below, and changed
+
+        for(GameNode x: this.unexploredWater) {
+
+            if(map.isReachable(x)) { 
+                ret = true;
+                break;
+            }
+
+        }
+
+        if(!this.onWater) this.disableWaterTravel();
+
+        return ret;
 
     }
 
@@ -188,9 +236,26 @@ public class GameState {
 
     }
 
-    public boolean hasUnexploredLand() {
+    public boolean hasUnexploredLand(GameMap map) {
 
-        return this.unexploredLand.size() > 0;
+        boolean ret = false;
+
+        if(this.onWater) this.enableLandTravel(); //?
+
+        for(GameNode x: this.unexploredLand) {
+
+            if(map.isReachable(x)) {
+                ret = true;
+                break;
+            }
+
+        }
+
+        if(this.onWater) this.disableLandTravel(); //? changed anyway
+
+        return ret;
+
+        //return this.unexploredLand.size() > 0;
 
     }
 
@@ -199,6 +264,26 @@ public class GameState {
         if(this.unexploredLand.contains(g)) return;
 
         this.unexploredLand.add(g);
+
+    }
+
+    public boolean isOnWater() {
+
+        return this.onWater;
+
+    }
+
+    public void setOnWater() {
+
+        //or keep in ehre for cloning...
+        this.onWater = true;
+
+    }
+
+    public void setOffWater() {
+
+        // as above...
+        this.onWater = false;
 
     }
 
@@ -274,12 +359,6 @@ public class GameState {
 
     }
 
-    public Point getCurrPos() {
-
-        return this.currentNode.getPoint();
-
-    }
-
     public GameNode getCurrNode() {
 
         return this.currentNode;
@@ -289,7 +368,6 @@ public class GameState {
     public void setCurrNode(GameNode node) {
 
         this.currentNode = node;
-        //update point or do sanity check?
 
     }
 
@@ -301,7 +379,6 @@ public class GameState {
             case 'd' : this.addBomb(); break;
             case 'a' : this.setAxe(); break;
             case '$' : this.setTreasure(); break;
-            //default : this.onWater = (node.getType() == '~'); //?
 
         }
 
@@ -327,53 +404,37 @@ public class GameState {
 
     }
 
-    private void manangeTerrain(char curr, char next) {
-
-        if(curr == '~' && next == ' ') { 
-            this.disableWaterTravel();
-            this.enableLandTravel();
-            this.setRaft(false);
-            this.onWater = false;
-        }else if(curr == ' ' && next == '~') {
-            this.enableWaterTravel();
-            this.disableLandTravel();
-            this.onWater = true;
-        }
-
-    }
-
     // could pass map as a param to this
-    public void move(GameNode[][] map) { //bit hacky inlcuding map here, maybe making up for bad logic elsewhere...
+    public void move(GameMap m) { //bit hacky inlcuding map here, maybe making up for bad logic elsewhere...
 
         GameNode curr = this.currentNode;
         int trueX = curr.getPoint().x;
         int trueY = curr.getPoint().y;
         char prevType = curr.getType();
+        GameNode[][] map = m.getMap();
 
         switch(this.currentDirection) {
 
             case 0: 
-                this.isBad(map[trueX-1][trueY]);
-                this.manangeTerrain(prevType, map[trueX-1][trueY].getType());
+                //this.isBad(map[trueX-1][trueY]);
+                this.terrMngr.processTerrainChange(map[trueX-1][trueY].getType());
                 this.currentNode = map[trueX-1][trueY];
                 break;
             case 1:
-                this.isBad(map[trueX][trueY+1]);
-                this.manangeTerrain(prevType, map[trueX][trueY+1].getType());
+                //this.isBad(map[trueX][trueY+1]);
+                this.terrMngr.processTerrainChange(map[trueX][trueY+1].getType());
                 this.currentNode = map[trueX][trueY+1];
                 break;
             case 2:
-                this.isBad(map[trueX+1][trueY]);
-                this.manangeTerrain(prevType, map[trueX+1][trueY].getType());
+                //this.isBad(map[trueX+1][trueY]);
+                this.terrMngr.processTerrainChange(map[trueX+1][trueY].getType());
                 this.currentNode = map[trueX+1][trueY];
                 break;
             case 3:
-                this.isBad(map[trueX][trueY-1]);
-                this.manangeTerrain(prevType, map[trueX][trueY-1].getType());
+                //this.isBad(map[trueX][trueY-1]);
+                this.terrMngr.processTerrainChange(map[trueX][trueY-1].getType());
                 this.currentNode = map[trueX][trueY-1];
                 break;
-            default: //debug
-                System.out.println("For some reason, move() in state fell to default with direction: "+this.currentDirection);
 
         }
 

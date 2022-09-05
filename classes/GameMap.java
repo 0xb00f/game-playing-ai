@@ -126,14 +126,14 @@ public class GameMap {
         }
 
         this.state.cleanUnexplored();
-        //printMap();
+        printMap();
 
     }
 
     // explore - does this return a goal or add it to be retrieved from state?
-    private Goal explore() {
+    private Goal explore(char terrain) {
 
-        return this.search.exploreDFS(this);
+        return this.search.exploreDFS(this,terrain);
 
     }
 
@@ -147,7 +147,7 @@ public class GameMap {
     public Goal exploreLand() {
 
         //this.state.disableWaterTravel();
-        return this.explore();
+        return this.explore(' ');
 
     }
 
@@ -155,7 +155,7 @@ public class GameMap {
     public Goal exploreWater() {
 
         //this.state.disableLandTravel();
-        return this.explore();
+        return this.explore('~');
 
     }
 
@@ -187,6 +187,14 @@ public class GameMap {
         return this.search.pathBFS(this, this.state.currentNode, n);
 
     }
+
+    public boolean isReachable(GameNode n) {
+
+        return this.search.floodFill(this, n) > 0;
+
+    }
+
+    //
 
     public GameNode getHome() {
 

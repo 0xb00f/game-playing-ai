@@ -78,4 +78,16 @@ public class Goal {
 
     }
 
+    public void setWater() {
+
+        crossWater = true;
+
+    }
+
+    public boolean crossesWater() {
+
+        return crossWater;
+
+    }
+
 }
