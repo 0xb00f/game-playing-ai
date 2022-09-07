@@ -3,10 +3,7 @@ import java.util.LinkedList;
 
 public class GoalManager {
 
-    /*
-     * this is all called from agentEngine - higher level logic, ddeclutter agent states and gamestate
-     */
-
+    //pending goals...
     private AgentActions actions;
     private GameMap map;
     private GameState state;
@@ -17,19 +14,19 @@ public class GoalManager {
         this.actions = a;
         this.map = m;
         this.state = s;
-        this.manhattanDistance = new ManhattanDistanceHeuristic();
+        this.manhattanDistance = new ManhattanDistanceHeuristic(); //del
 
     }
 
     //check goal node is reachable
-    public boolean nodeReachable(GameNode n) {
+    public boolean nodeReachable(GameNode n) { //del
 
         return this.map.reachable(n) != null;
 
     }
 
     //get nearest node type
-    public GameNode getNearest(LinkedList<GameNode> list) {
+    public GameNode getNearest(LinkedList<GameNode> list) { //del
 
         GameNode n = null;
         int minDist = Integer.MAX_VALUE;
@@ -71,11 +68,13 @@ public class GoalManager {
 
     public void addGoal(GameNode g) {
 
+        //more complex with bomb logic, they have an empty path....
+
         this.state.addGoal(g);
 
     }
 
-    public GameNode getReachable(LinkedList<GameNode> list) { //?
+    public GameNode getReachable(LinkedList<GameNode> list) { //del
 
         GameNode n = null;
 
@@ -95,28 +94,11 @@ public class GoalManager {
 
     public GameNode getNextGoal() {
 
-        /*
-        GameNode n = null;
-
-        for(GameNode m : this.state.pendingGoals) {
-
-            if(this.nodeReachable(m)) {
-                n = m;
-                this.state.pendingGoals.remove(m);
-                break;
-            }
-
-        }
-
-        return n;*/
         return this.state.pendingGoals.poll();
 
     }
 
-    //generate a goal from seen items, etc
-
-    //goals available
-    public boolean hasPotentialGoals() {
+    public boolean hasPotentialGoals() { //del
 
         return this.state.hasSeenBombs() || this.state.hasUnexploredLand(this.map) || this.state.hasUnexploredWater(this.map);
 
@@ -130,20 +112,20 @@ public class GoalManager {
 
     }
 
-    public GameNode getNearestBomb() { //del
+    public GameNode getNearestBomb() { //change
 
         GameNode n = this.getNearest(this.state.seenBombs);
         return n;
 
     }
 
-    public GameNode getNearestLand() { //del
+    public GameNode getNearestLand() { //change
 
         return this.getNearest(this.state.unexploredLand);
 
     }
 
-    public GameNode getNearestWater() { //del
+    public GameNode getNearestWater() { //change
 
         return this.getNearest(this.state.unexploredWater);
 
@@ -164,7 +146,7 @@ public class GoalManager {
 
     }
 
-    public boolean getRaft() { //del
+    public boolean getRaft() { //change to floodfill
 
         GameNode n = this.getNearestRaft();
         Goal g = this.map.pursueGoal(n);
@@ -180,7 +162,7 @@ public class GoalManager {
 
     }
 
-    public boolean goToWater() {
+    public boolean goToWater() { //floodfill
 
         GameNode n = this.getNearestWater();
         Goal g = this.map.pursueGoal(n);
@@ -196,7 +178,7 @@ public class GoalManager {
 
     }
 
-    public boolean goToLand() {
+    public boolean goToLand() { //floodfill
 
         GameNode n = this.getNearestLand();
         Goal g = this.map.pursueGoal(n);
@@ -212,7 +194,7 @@ public class GoalManager {
 
     }
 
-    public boolean pursueGoal() {
+    public boolean pursueGoal() { //think better logic
 
         GameNode n = null;
 

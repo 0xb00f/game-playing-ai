@@ -6,11 +6,10 @@ import java.util.PriorityQueue;
 public class GameState { 
 
     public PriorityQueue<GameNode> pendingGoals; 
-    //public HashMap<Character,ArrayList<GameNode>> seenItems; // BUT there will need to be a priority to these... most important first
-    public LinkedList<GameNode> unexploredLand; //used?
-    public LinkedList<GameNode> unexploredWater; //used?
-    public LinkedList<GameNode> seenRafts; 
-    public LinkedList<GameNode> seenBombs; 
+    public LinkedList<GameNode> unexploredLand; //del
+    public LinkedList<GameNode> unexploredWater; //del
+    public LinkedList<GameNode> seenRafts; //del
+    public LinkedList<GameNode> seenBombs; //del
     public boolean axe;
     public boolean raft;
     public boolean key;
@@ -39,17 +38,16 @@ public class GameState {
     public GameState() {
 
         this.pendingGoals = new PriorityQueue<GameNode>(new GoalCompare());
-        //this.seenItems = new HashMap<Character,ArrayList<GameNode>>(); 
-        this.unexploredLand = new LinkedList<GameNode>();
-        this.unexploredWater = new LinkedList<GameNode>();
-        this.seenRafts = new LinkedList<GameNode>();
-        this.seenBombs = new LinkedList<GameNode>();
+        this.unexploredLand = new LinkedList<GameNode>(); //del
+        this.unexploredWater = new LinkedList<GameNode>(); //del 
+        this.seenRafts = new LinkedList<GameNode>(); //del 
+        this.seenBombs = new LinkedList<GameNode>(); //del
         this.axe = false;
         this.raft = false;
         this.key = false;
         this.treasure = false;
         this.numBombs = 0;
-        this.currentNode = null; // filled in mapView
+        this.currentNode = null; //new GameNode(0,0); // init currnode to start
         this.currentDirection = 0; // north by default
         this.validTerrain = new HashSet<Character>(); //moved
         this.terrMngr = null;
@@ -57,7 +55,7 @@ public class GameState {
 
     }
 
-    public GameState cloneState(GameNode n) {
+    public GameState cloneState(GameNode n) { //del
 
         GameState clonedState = new GameState();
         clonedState.setAgentState(this.currAgentState);
@@ -107,7 +105,7 @@ public class GameState {
 
     }
 
-    public void enableWaterTravel() { //edit
+    public void enableWaterTravel() { 
 
         //System.out.println("ENABLING WATER");
         this.terrMngr.enableWaterTravel();
@@ -115,28 +113,28 @@ public class GameState {
 
     }
 
-    public void enableLandTravel() { //edit
+    public void enableLandTravel() { 
 
         //this.validTerrain.add(' ');
         this.terrMngr.enableLandTravel();
 
     }
 
-    public void disableWaterTravel() { //edit
+    public void disableWaterTravel() { 
 
         //this.validTerrain.remove('~');
         this.terrMngr.disableWaterTravel();
 
     }
 
-    public void disableLandTravel() { //edit
+    public void disableLandTravel() { 
 
         //this.validTerrain.remove(' ');
         this.terrMngr.disableLandTravel();
 
     }
 
-    public void addGoal(GameNode g) { //keep this, basic setter
+    public void addGoal(GameNode g) { //transfer goals into goal manager?
 
         if(this.pendingGoals.contains(g)) return;
 
@@ -146,13 +144,13 @@ public class GameState {
 
     }
 
-    public boolean hasSeenRafts() {
+    public boolean hasSeenRafts() { //del
 
         return this.seenRafts.size() > 0;
 
     }
 
-    public void addSeenRaft(GameNode n) {
+    public void addSeenRaft(GameNode n) { //del
 
         if(this.seenRafts.contains(n)) return;
 
@@ -160,13 +158,13 @@ public class GameState {
 
     }
 
-    public boolean hasSeenBombs() {
+    public boolean hasSeenBombs() { //del
 
         return this.seenBombs.size() > 0;
 
     }
 
-    public void addSeenBomb(GameNode n) {
+    public void addSeenBomb(GameNode n) { //del
 
         if(this.seenBombs.contains(n)) return;
 
@@ -178,17 +176,17 @@ public class GameState {
 
         switch(n.getType()) {
 
-            case ' ': if(!n.isVisited()) this.addUnexploredLand(n); break;
-            case '~': if(!n.isVisited()) this.addUnexploredWater(n); break;            
-            case 'T': this.addSeenRaft(n); break;
-            case 'd': this.addSeenBomb(n); break;
-            case 'k': case '$': case 'a': this.addGoal(n); break; //what about going home?, duplicates too how is this called
+            case ' ': if(!n.isVisited()) this.addUnexploredLand(n); break; //del
+            case '~': if(!n.isVisited()) this.addUnexploredWater(n); break;    //del        
+            case 'T': this.addSeenRaft(n); break; //del
+            case 'd': this.addSeenBomb(n); break; //change to goal
+            case 'k': case '$': case 'a': this.addGoal(n); break; 
 
         }
 
     }
 
-    public void cleanUnexplored() {
+    public void cleanUnexplored() { //del
 
         LinkedList<GameNode> kill = new LinkedList<GameNode>();
 
@@ -207,7 +205,7 @@ public class GameState {
 
     }
 
-    public boolean hasUnexploredWater(GameMap map) {
+    public boolean hasUnexploredWater(GameMap map) { //del
 
         boolean ret = false;
 
@@ -228,7 +226,7 @@ public class GameState {
 
     }
 
-    public void addUnexploredWater(GameNode g) {
+    public void addUnexploredWater(GameNode g) { //del
 
         if(this.unexploredWater.contains(g)) return;
 
@@ -236,7 +234,7 @@ public class GameState {
 
     }
 
-    public boolean hasUnexploredLand(GameMap map) {
+    public boolean hasUnexploredLand(GameMap map) { //del
 
         boolean ret = false;
 
@@ -259,7 +257,7 @@ public class GameState {
 
     }
 
-    public void addUnexploredLand(GameNode g) {
+    public void addUnexploredLand(GameNode g) { //del
 
         if(this.unexploredLand.contains(g)) return;
 
@@ -275,14 +273,12 @@ public class GameState {
 
     public void setOnWater() {
 
-        //or keep in ehre for cloning...
         this.onWater = true;
 
     }
 
     public void setOffWater() {
 
-        // as above...
         this.onWater = false;
 
     }
@@ -392,6 +388,7 @@ public class GameState {
 
         if(node.getType() != '~') node.clearNode();
         node.setVisited();
+        //this.currentNode = node; //?
 
     }
 
@@ -404,39 +401,41 @@ public class GameState {
 
     }
 
-    // could pass map as a param to this
-    public void move(GameMap m) { //bit hacky inlcuding map here, maybe making up for bad logic elsewhere...
+    public void move(GameMap m) { // greatly simplify with graph.... and mvoe to gent engin...
 
         GameNode curr = this.currentNode;
-        int trueX = curr.getPoint().x;
-        int trueY = curr.getPoint().y;
-        char prevType = curr.getType();
-        GameNode[][] map = m.getMap();
+        Graph map = m.getMap();
 
         switch(this.currentDirection) {
 
             case 0: 
                 //this.isBad(map[trueX-1][trueY]);
-                this.terrMngr.processTerrainChange(map[trueX-1][trueY].getType());
-                this.currentNode = map[trueX-1][trueY];
+                GameNode north = map.getNorthNeighbour(curr);
+                this.terrMngr.processTerrainChange(north.getType());
+                this.currentNode = north;
                 break;
             case 1:
                 //this.isBad(map[trueX][trueY+1]);
-                this.terrMngr.processTerrainChange(map[trueX][trueY+1].getType());
-                this.currentNode = map[trueX][trueY+1];
+                GameNode east = map.getEastNeighbour(curr);
+                this.terrMngr.processTerrainChange(east.getType());
+                this.currentNode = east;
                 break;
             case 2:
                 //this.isBad(map[trueX+1][trueY]);
-                this.terrMngr.processTerrainChange(map[trueX+1][trueY].getType());
-                this.currentNode = map[trueX+1][trueY];
+                GameNode south = map.getSouthNeighbour(curr);
+                this.terrMngr.processTerrainChange(south.getType());
+                this.currentNode = south;
                 break;
             case 3:
                 //this.isBad(map[trueX][trueY-1]);
-                this.terrMngr.processTerrainChange(map[trueX][trueY-1].getType());
-                this.currentNode = map[trueX][trueY-1];
+                GameNode west = map.getWestNeighbour(curr);
+                this.terrMngr.processTerrainChange(west.getType());
+                this.currentNode = west;
                 break;
 
         }
+
+        System.out.println("CURR POS IS "+ this.currentNode.getPoint().toString());
 
     }
 

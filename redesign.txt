@@ -1,0 +1,68 @@
+*Main points
+- agentstate logic for each state
+- edge cases when transitioning between states
+- is clonedstate necessary? no, goalstste will suffice
+- bombs should be goals...
+- terrain logic, think about it
+- floodfill to find rafts, no seen rafts, messy
+- what is an obstruction and what isnt, and when?
+- proper graph for map
+
+WATER TRAVEL 
+*When is it OK to travel on water? or go to water?
+- only when agent has a raft
+*When is it not OK to travel on water?
+- when no raft
+- when in land explore mode
+*When is it NOT OK to cross from water onto land?
+- when in water explore mode
+---crossing land when on water should lead to dead end in A* state search as cant continue...
+
+STATE TRANSITIONS
+*Land explore -> water explore
+- if no raft, first get raft before transitioning to water explore
+- do not transition if raft not able to be collected
+*Water explore -> land explore
+- if not already on land, go to nearest unexplored land before transition (floodfill)
+- if not land reached, do not change state
+*Goal pursuit
+- always favour pursuing a goal over exploring, if there's a goal, go for it
+
+TREES
+- trees are not to be cleared on land exploration
+- trees are to be cleared in a path to unexplored land, or to goal, ONLY (boolean toggle in state?)
+
+LAND EXPLORE STATE
+- explore all immediately reachable land, collecting items and going through doors if needed. DO NOT power through trees
+- if there remains reachable unexplored land, go there and continue, THROUGH TREES TO GET THERE IF NEED be
+- if all land explored and none left that can be reached, transition:
+1. go into goal pursuit if there exists a goal
+2. go into water exploration is there exists reachable unexplored water (and then only if a raft grabbable)
+
+WATER EXPLORE STATE
+- simply explore all reachable water that does not require crossing land, strict water-only state
+- if no more water left, transition:
+1. go into goal pursuit if there exists a goal
+2. go to land if there exists reachable unexplored land (go to land first)
+
+GOAL PURSUIT STATE
+- if there is a goal, deque it, and pursue it
+- if goal not reachable or no goal available, transition:
+1. go to land if there exists reachable unexplored land
+2. go into water exploration is there exists reachable unexplored water (and then only if a raft grabbable)
+
+GoalState
+- track raft, key, bombs, onwater
+- use instead of cloning state (above will suffice for terrain mgmt)
+
+floodfill
+- used to return reachable land, water, rafts in lieu of "seen item" lists
+- alternative implementation for counting reachable items...
+
+OBSTRUCTIONS ETC
+-k,a,d,$: all items, collectible
+-T: not to be cleared when exploring land, except when going to new unexplored region and way needs to be cleared (change state to goal? will fall abck to land first)
+ but trees clearable during goal pursuit (handled in GoalState - slightly higher path cost)
+
+BOMB GOALS 
+- want add bombs as goals but not add multiple, when it is reached we want to floodfill to find nearest...

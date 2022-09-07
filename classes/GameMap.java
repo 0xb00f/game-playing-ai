@@ -1,19 +1,25 @@
 import java.awt.Point;
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class GameMap {
 
-    private GameNode[][] map;
+    private Graph map; //GameNode[][] map; //
     private SearchGameMap search;
     private GameState state;
-    private int mapDimension = 200;
+    private int mapDimension = 200; //not needed
 
     public GameMap(GameState state) {
 
-        this.map = new GameNode[this.mapDimension][this.mapDimension];
+        this.map = new Graph(); //GameNode[this.mapDimension][this.mapDimension];
         this.state = state;
         this.search = new SearchGameMap(state);
+        //this.initGraph(); //wont be needed...
+        // agent automatically begins at (100,100)
+        //this.state.setCurrNode(new GameNode(0,0)); //this.state.setCurrNode(this.map[100][100]); //
+
+    }
+    /* 
+    private void initGraph() { //del
 
         for(int i=0; i < this.mapDimension; i++) {
             for(int j=0; j < this.mapDimension; j++) {
@@ -21,10 +27,7 @@ public class GameMap {
             }
         }
 
-        // agent automatically begins at (100,100)
-        this.state.setCurrNode(this.map[100][100]);
-
-    }
+    }*/
 
     private void rotateLeft(char[][] view) {
 
@@ -74,8 +77,8 @@ public class GameMap {
         }
 
     }
-    
-    private void printMap() {
+    /* 
+    private void printMap() { //del
 
         System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 
@@ -92,6 +95,12 @@ public class GameMap {
 
         System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 
+    }*/
+
+    public boolean sanity() {
+
+        return this.map.sanity();
+
     }
     
     public void mapView(char[][] view) {
@@ -102,15 +111,28 @@ public class GameMap {
         Point pos = playerNode.getPoint();
         int playerX = pos.x;
         int playerY = pos.y;
+        
 
         for(int i=0; i < 5; i++) {
 
             for(int j=0; j < 5; j++) {
 
-                int trueX = i-2+playerX; 
-                int trueY = j-2+playerY; 
+                int trueX = j-2+playerX; //i-2+playerX; //
+                int trueY = -(i-2)+playerY; //j-2+playerY; //
 
-                GameNode curr = this.map[trueX][trueY];
+                Point currP = new Point(trueX,trueY);
+                GameNode curr = null;
+                //check if node/point exists
+                if(this.map.pointExists(currP)) {
+                    //if yes, return it
+                     curr = this.map.nodeFromPoint(currP);
+                }else{
+                    //if not, create and add to map
+                    curr = new GameNode(trueX,trueY);
+                    this.map.addNode(curr);
+                }
+
+                this.map.connectNode(curr);
 
                 if(i==2 && j==2) { 
                     this.state.updateCurrState(curr); 
@@ -118,15 +140,15 @@ public class GameMap {
                     curr.recordNode(view[i][j]);
                 }
 
-                //if(curr.isItem()) this.state.addSeenItem(view[i][j],curr); 
                 this.state.rememberNode(curr);
 
             }
 
         }
 
-        this.state.cleanUnexplored();
-        printMap();
+        this.state.cleanUnexplored(); //del
+        this.map.debugGraph();
+        //printMap();
 
     }
 
@@ -137,7 +159,7 @@ public class GameMap {
 
     }
 
-    public GameNode[][] getMap() {
+    public Graph getMap() { //change
 
         return this.map;
 
@@ -159,30 +181,19 @@ public class GameMap {
 
     }
 
-    // pursue goal - does this return a goal or add it to be retrieved from state?
     public Goal pursueGoal(GameNode n) {
 
         return this.search.astarSearch(this, n, new ManhattanDistanceHeuristic());
 
     }
 
-    public ArrayList<GameNode> getNeighbours(GameNode g) {
+    public LinkedList<GameNode> getNeighbours(GameNode n) { 
 
-        ArrayList<GameNode> neighbours = new ArrayList<GameNode>();
-
-        Point p = g.getPoint();
-        int x = p.x, y = p.y;
-        
-        neighbours.add(this.map[x-1][y]); //no bounds checking, relying on maps being small..
-        neighbours.add(this.map[x+1][y]);
-        neighbours.add(this.map[x][y-1]);
-        neighbours.add(this.map[x][y+1]);
-
-        return neighbours;
+        return this.map.getAllNeighbours(n);
 
     }
 
-    public LinkedList<GameNode> reachable(GameNode n) {
+    public LinkedList<GameNode> reachable(GameNode n) { //del
 
         return this.search.pathBFS(this, this.state.currentNode, n);
 
@@ -194,11 +205,9 @@ public class GameMap {
 
     }
 
-    //
-
     public GameNode getHome() {
 
-        return this.map[100][100];
+        return this.map.getHomeNode();
 
     }
 

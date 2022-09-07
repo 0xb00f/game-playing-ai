@@ -5,14 +5,14 @@ public class Goal {
     private int weight;
     private GameNode goalNode; 
     private LinkedList<GameNode> path;
-    private boolean crossWater; //where does this get set??
+    private boolean crossWater; //del
 
     public Goal(GameNode n) {
 
         this.weight = this.calcWeight(n);
         this.goalNode = n;
         this.path = new LinkedList<GameNode>();
-        this.crossWater = false;
+        this.crossWater = false; //not needed
 
     }
 
@@ -60,8 +60,6 @@ public class Goal {
 
     public void addToPath(GameNode n) {
 
-        if(n.getType() == '~') this.crossWater = true; //?
-
         this.path.add(n);
 
     }
@@ -72,19 +70,19 @@ public class Goal {
 
     }
 
-    public GameNode pathEnd() {
+    public GameNode pathEnd() { //del
 
         return this.path.peekLast();
 
     }
 
-    public void setWater() {
+    public void setWater() { //del
 
         crossWater = true;
 
     }
 
-    public boolean crossesWater() {
+    public boolean crossesWater() { //del
 
         return crossWater;
 

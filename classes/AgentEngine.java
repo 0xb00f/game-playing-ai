@@ -25,6 +25,7 @@ public class AgentEngine {
         this.terrMngr = new TerrainManager(this.state, this.exploreLand, this.exploreWater, this.pursueGoal);
         this.state.setTerrainManager(this.terrMngr);
         this.state.enableLandTravel(); //starting out on land
+        this.state.setCurrNode(this.map.getHome());
         
     }
 

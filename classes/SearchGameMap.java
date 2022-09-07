@@ -1,9 +1,11 @@
+import java.awt.Point;
 import java.util.ArrayDeque;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
+
 
 public class SearchGameMap {
     
@@ -15,7 +17,11 @@ public class SearchGameMap {
 
     }
 
-    public int floodFill(GameMap map, GameNode node) { //node arg for reachability too...
+    /*
+     * USES:
+     * 1. to return location of nearest reachable raft, land, water (arg should be a char)
+     */
+    public int floodFill(GameMap map, GameNode node) { //char target
 
         int nItems = 0;
         HashSet<GameNode> seen = new HashSet<GameNode>();
@@ -29,8 +35,7 @@ public class SearchGameMap {
 
             GameNode curr = q.poll();
             seen.add(curr);
-            
-            if(node == null && curr.isItem()) nItems++;
+
             if(curr == node) {
                 
                 //System.out.println("NODE OF TYPE '"+node.getType()+"' REACHABLE");
@@ -55,8 +60,12 @@ public class SearchGameMap {
 
     public LinkedList<GameNode> pathBFS(GameMap map, GameNode start, GameNode end) {
 
+        //if(!map.sanity()) System.exit(1); //debug
+
+        //MAP LOSING POSITION!!! tried chanigng to point here to no avail
+
         ArrayDeque<Goal> queue = new ArrayDeque<Goal>();
-        HashSet<GameNode> seen = new HashSet<GameNode>(); 
+        HashSet<Point> seen = new HashSet<Point>(); 
         Goal g = new Goal(start);
         queue.add(g);
 
@@ -64,18 +73,19 @@ public class SearchGameMap {
 
             Goal curr = queue.poll();
             GameNode currNode = curr.getGoalNode();
-            seen.add(currNode);
+            seen.add(currNode.getPoint());
 
             if(currNode == end) {
 
                 return curr.getPath();
 
             }
-
+            System.out.println("BFS CURR NODE IS "+currNode.getPoint().toString()+" of type '"+currNode.getType()+"'");
             for(GameNode n : map.getNeighbours(currNode)) {
 
-                if(seen.contains(n)) continue;
+                if(seen.contains(n.getPoint())) continue;
                 if(n.outOfBounds(this.state)) continue;
+                System.out.println("ENQ NEIGHBOUR "+n.getPoint().toString()+" of type '"+n.getType()+"'");
                 Goal next = new Goal(n);
                 next.extendPath(curr.getPath());
                 next.addToPath(n);
@@ -131,6 +141,8 @@ public class SearchGameMap {
                 seen.add(curr);
 
                 if(!curr.isVisited()) toExplore.add(curr); //shouldn't add curr node!
+
+                //System.out.println("EXPLORE: looking at neighbours of ndoe at "+curr.getPoint().toString());
 
                 for(GameNode n : map.getNeighbours(curr)) {
 

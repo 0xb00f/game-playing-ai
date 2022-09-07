@@ -9,6 +9,12 @@ public class GoalSearchState {
     private int hValue; 
     private int gValue; //path cost
 
+    //TO ADD - remove localstate
+    //hasraft
+    //haskey
+    //nbombs
+    //onwater
+
     public GoalSearchState(GoalSearchState prev, GameNode node) {
 
         this.localState = null;
@@ -118,10 +124,10 @@ public class GoalSearchState {
         Point p = currNode.getPoint();
         int x = p.x, y = p.y;
 
-        GameNode[][] m = map.getMap();
+        Graph m = map.getMap();
 
         //north
-        GameNode north = m[x-1][y];
+        GameNode north = m.getNorthNeighbour(currNode);
         GameState northState = this.localState.cloneState(north);
         if(updateStateOnMove(north,northState)) {
             GoalSearchState nextNorth = new GoalSearchState(this, north);
@@ -131,7 +137,7 @@ public class GoalSearchState {
         }
 
         //south
-        GameNode south = m[x+1][y];
+        GameNode south = m.getSouthNeighbour(currNode);
         GameState southState = this.localState.cloneState(south);
         if(updateStateOnMove(south,southState)) {
             GoalSearchState nextSouth = new GoalSearchState(this, south);
@@ -140,7 +146,7 @@ public class GoalSearchState {
         }
 
         //east
-        GameNode east = m[x][y+1];
+        GameNode east = m.getEastNeighbour(currNode);
         GameState eastState = this.localState.cloneState(east);
         if(updateStateOnMove(east,eastState)) {
             GoalSearchState nextEast = new GoalSearchState(this, east);
@@ -149,7 +155,7 @@ public class GoalSearchState {
         }
 
         //west
-        GameNode west = m[x][y-1];
+        GameNode west = m.getWestNeighbour(currNode);
         GameState westState = this.localState.cloneState(west);
         if(updateStateOnMove(west,westState)) {
             GoalSearchState nextWest = new GoalSearchState(this, west);
