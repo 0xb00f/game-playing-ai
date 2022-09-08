@@ -6,7 +6,6 @@ public class GameMap {
     private Graph map; //GameNode[][] map; //
     private SearchGameMap search;
     private GameState state;
-    private int mapDimension = 200; //not needed
 
     public GameMap(GameState state) {
 
@@ -136,6 +135,8 @@ public class GameMap {
 
                 if(i==2 && j==2) { 
                     this.state.updateCurrState(curr); 
+                    //debug
+                    if(this.state.getCurrNode() != curr) System.out.println("MAP: CURR NODE MISMATCH!");
                 }else{
                     curr.recordNode(view[i][j]);
                 }
@@ -146,8 +147,9 @@ public class GameMap {
 
         }
 
-        this.state.cleanUnexplored(); //del
-        this.map.debugGraph();
+        //this.state.cleanUnexplored(); //del
+        //this.map.printPercept(this.state.getCurrNode());
+        //this.map.debugGraph();
         //printMap();
 
     }
@@ -193,13 +195,21 @@ public class GameMap {
 
     }
 
+    public GameNode findReachable(char target) { //TO REPLACE THE TWO LOWER: rafts/unexplored
+
+        //GameNode result = this.search.floodFill(this,target);
+
+        return null;
+
+    }
+
     public LinkedList<GameNode> reachable(GameNode n) { //del
 
         return this.search.pathBFS(this, this.state.currentNode, n);
 
     }
 
-    public boolean isReachable(GameNode n) {
+    public boolean isReachable(GameNode n) { //del
 
         return this.search.floodFill(this, n) > 0;
 

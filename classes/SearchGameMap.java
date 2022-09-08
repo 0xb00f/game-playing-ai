@@ -36,10 +36,9 @@ public class SearchGameMap {
             GameNode curr = q.poll();
             seen.add(curr);
 
-            if(curr == node) {
+            if(curr == node) { //match types
                 
-                //System.out.println("NODE OF TYPE '"+node.getType()+"' REACHABLE");
-                return 1;
+                return 1; //return node instead, for path planning
 
             }
             
@@ -54,7 +53,7 @@ public class SearchGameMap {
 
         }
 
-        return nItems;
+        return nItems; //null
 
     }
 
@@ -80,12 +79,17 @@ public class SearchGameMap {
                 return curr.getPath();
 
             }
-            System.out.println("BFS CURR NODE IS "+currNode.getPoint().toString()+" of type '"+currNode.getType()+"'");
+            //System.out.println("BFS CURR NODE IS "+currNode.getPoint().toString()+" of type '"+currNode.getType()+"'");
+            //System.out.println("NEIGHBOURS ARE:");
+            //for(GameNode n : map.getNeighbours(currNode)) {
+              //  System.out.println("\t'"+n.getType()+"' at "+n.getPoint().toString());
+            //}
+
             for(GameNode n : map.getNeighbours(currNode)) {
 
                 if(seen.contains(n.getPoint())) continue;
                 if(n.outOfBounds(this.state)) continue;
-                System.out.println("ENQ NEIGHBOUR "+n.getPoint().toString()+" of type '"+n.getType()+"'");
+                //System.out.println("ENQ NEIGHBOUR "+n.getPoint().toString()+" of type '"+n.getType()+"'");
                 Goal next = new Goal(n);
                 next.extendPath(curr.getPath());
                 next.addToPath(n);
@@ -116,9 +120,6 @@ public class SearchGameMap {
             prev = curr;
         }
 
-        //System.out.println("CONST PATH:");
-        //for(GameNode x: g.getPath()) System.out.print(x.getType()+",");
-        //System.out.println("");
         return g;
 
     }
@@ -128,6 +129,8 @@ public class SearchGameMap {
         ArrayDeque<GameNode> stack = new ArrayDeque<GameNode>();
         HashSet<GameNode> seen = new HashSet<GameNode>(); 
         LinkedList<GameNode> toExplore = new LinkedList<GameNode>();
+
+        //System.out.println("DFS STARTING FROM "+this.state.getCurrNode().getPoint().toString());
 
         toExplore.add(this.state.getCurrNode());
         stack.push(this.state.getCurrNode());
@@ -150,7 +153,7 @@ public class SearchGameMap {
 
                     if(seen.contains(n) || n.outOfBounds(this.state)) continue;
 
-                    System.out.println("EXPLORING NODE TYPE '"+n.getType()+"'");
+                    //System.out.println("EXPLORING NODE TYPE '"+n.getType()+"'");
 
                     stack.push(n);
 

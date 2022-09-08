@@ -105,10 +105,10 @@ public class AgentActions {
         Point next = n.getPoint();
         Point curr = c.getPoint();
 
-        if(next.x < curr.x && next.y == curr.y) return 0;
-        if(next.x > curr.x && next.y == curr.y) return 2;
-        if(next.y > curr.y && next.x == curr.x) return 1;
-        if(next.y < curr.y && next.x == curr.x) return 3;
+        if(next.y > curr.y && next.x == curr.x) return 0;
+        if(next.y < curr.y && next.x == curr.x) return 2;
+        if(next.x > curr.x && next.y == curr.y) return 1;
+        if(next.x < curr.x && next.y == curr.y) return 3;
 
         return -1;
 

@@ -129,7 +129,7 @@ public class GoalSearchState {
         //north
         GameNode north = m.getNorthNeighbour(currNode);
         GameState northState = this.localState.cloneState(north);
-        if(updateStateOnMove(north,northState)) {
+        if(north != null && updateStateOnMove(north,northState)) {
             GoalSearchState nextNorth = new GoalSearchState(this, north);
             nextNorth.setG(this.gValue + north.nodeWeight());
             nextNorth.setState(northState);
@@ -139,7 +139,7 @@ public class GoalSearchState {
         //south
         GameNode south = m.getSouthNeighbour(currNode);
         GameState southState = this.localState.cloneState(south);
-        if(updateStateOnMove(south,southState)) {
+        if(south != null &&updateStateOnMove(south,southState)) {
             GoalSearchState nextSouth = new GoalSearchState(this, south);
             nextSouth.setState(southState);
             ret.add(nextSouth);
@@ -148,7 +148,7 @@ public class GoalSearchState {
         //east
         GameNode east = m.getEastNeighbour(currNode);
         GameState eastState = this.localState.cloneState(east);
-        if(updateStateOnMove(east,eastState)) {
+        if(east != null && updateStateOnMove(east,eastState)) {
             GoalSearchState nextEast = new GoalSearchState(this, east);
             nextEast.setState(eastState);
             ret.add(nextEast);
@@ -157,7 +157,7 @@ public class GoalSearchState {
         //west
         GameNode west = m.getWestNeighbour(currNode);
         GameState westState = this.localState.cloneState(west);
-        if(updateStateOnMove(west,westState)) {
+        if(west != null && updateStateOnMove(west,westState)) {
             GoalSearchState nextWest = new GoalSearchState(this, west);
             nextWest.setState(westState);
             ret.add(nextWest);

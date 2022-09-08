@@ -138,7 +138,7 @@ public class GameState {
 
         if(this.pendingGoals.contains(g)) return;
 
-        System.out.println("ADDING GOAL: '"+g.getType()+"'");
+        //System.out.println("ADDING GOAL: '"+g.getType()+"'");
 
         this.pendingGoals.add(g);
 
@@ -183,6 +183,8 @@ public class GameState {
             case 'k': case '$': case 'a': this.addGoal(n); break; 
 
         }
+
+        //if(n.getType() == 'k' || n.getType() == '$') System.out.println("ITEM '"+n.getType()+"' seen at "+n.getPoint().toString());
 
     }
 
@@ -380,7 +382,7 @@ public class GameState {
 
         if(node.isItem()) {
 
-            System.out.println("Removing goal: '"+node.getType()+"'");
+            //System.out.println("Removing goal: '"+node.getType()+"'");
             if(node.getType() == 'd') this.seenBombs.remove(node);
             this.pendingGoals.remove(node);
 
@@ -409,33 +411,36 @@ public class GameState {
         switch(this.currentDirection) {
 
             case 0: 
-                //this.isBad(map[trueX-1][trueY]);
                 GameNode north = map.getNorthNeighbour(curr);
+                this.isBad(north);
                 this.terrMngr.processTerrainChange(north.getType());
                 this.currentNode = north;
                 break;
             case 1:
                 //this.isBad(map[trueX][trueY+1]);
                 GameNode east = map.getEastNeighbour(curr);
+                this.isBad(east);
                 this.terrMngr.processTerrainChange(east.getType());
                 this.currentNode = east;
                 break;
             case 2:
                 //this.isBad(map[trueX+1][trueY]);
                 GameNode south = map.getSouthNeighbour(curr);
+                this.isBad(south);
                 this.terrMngr.processTerrainChange(south.getType());
                 this.currentNode = south;
                 break;
             case 3:
                 //this.isBad(map[trueX][trueY-1]);
                 GameNode west = map.getWestNeighbour(curr);
+                this.isBad(west);
                 this.terrMngr.processTerrainChange(west.getType());
                 this.currentNode = west;
                 break;
 
         }
 
-        System.out.println("CURR POS IS "+ this.currentNode.getPoint().toString());
+        //System.out.println("CURR POS IS "+ this.currentNode.getPoint().toString()+" facing direction="+this.currentDirection);
 
     }
 

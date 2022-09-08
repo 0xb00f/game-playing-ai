@@ -51,11 +51,37 @@ public class Graph {
     }
 
     //debug
+    public void printPercept(GameNode curr) {
+
+        System.out.println("#########################");
+
+        for(int i=0; i <5; i++) {
+
+            for(int j=0; j<5; j++){
+
+                Point p = curr.getPoint();
+                int px = p.x, py = p.y;
+                Point x = new Point(j-2+px,-(i-2)+py);
+                if(!this.pointExists(x)) continue;
+                System.out.print(this.nodeFromPoint(x).getType());
+
+            }
+
+            System.out.println("");
+
+        }
+
+        System.out.println("#########################");
+
+
+    }
+
+    //debug
     public void debugGraph() {
 
         for(GameNode n: this.graph.keySet()) {
 
-            System.out.println("Neighbours of node at "+n.getPoint().toString()+":");
+            System.out.println("Neighbours of node at "+n.getPoint().toString()+" of type '"+n.getType()+"':");
             for(GameNode m: this.graph.get(n)) {
                 
                 System.out.println("EDGE TO "+m.getPoint().toString());
@@ -84,8 +110,6 @@ public class Graph {
 
         if(this.nodeExists(n)) return;
 
-        //System.out.println("ADDING NODE AT "+n.getPoint().toString());
-
         this.graph.put(n, new LinkedList<GameNode>());
         this.pointDict.put(n.getPoint(), n);
 
@@ -102,7 +126,6 @@ public class Graph {
     //add edge between two vertices
     public void addEdge(GameNode n, GameNode m) {
 
-       // System.out.println("ADDING EDGE FROM "+n.getPoint().toString()+" to "+m.getPoint().toString());
         this.graph.get(n).add(m);
         this.graph.get(m).add(n);
 
@@ -110,8 +133,6 @@ public class Graph {
 
     //return all neighbours
     public LinkedList<GameNode> getAllNeighbours(GameNode n) {
-
-        //System.out.println("GETTING NEIGHS OF "+n.getPoint().toString());
 
         return this.graph.get(n);
 

@@ -43,6 +43,12 @@ public class AgentEngine {
 
     }
 
+    public GameNode findReachableNode(char target) { //new
+
+        return this.map.findReachable(target);
+
+    }
+
     public void setAgentState(AgentState newState) {
 
         this.currentState = newState;

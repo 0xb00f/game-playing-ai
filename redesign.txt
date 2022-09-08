@@ -66,3 +66,10 @@ OBSTRUCTIONS ETC
 
 BOMB GOALS 
 - want add bombs as goals but not add multiple, when it is reached we want to floodfill to find nearest...
+
+STEPS
+1. get graph working (DONE!)
+2. floodfill find reachable items
+3. state transitions
+4. obstrustions and terrain
+5. goal state and search logic

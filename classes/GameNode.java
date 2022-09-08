@@ -91,7 +91,7 @@ public class GameNode {
 
             case '.' : return true; 
             case '*' : return true;
-            case '-' : return !state.hasKey();
+            case '-' : return state.hasKey() == false;
             case '~' : case ' ' : return state.isValidTerrain(this.nodeType) == false;
 
         }
