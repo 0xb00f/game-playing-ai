@@ -30,23 +30,22 @@ public class LandExploreAgentState implements AgentState {
             this.agentEngine.addGoalActions(g);
             return;
 
-        }else if(!this.agentEngine.hasGoal()  && this.agentEngine.hasUnexploredLand()) {
+        }else{
 
+            //explore failed to go anywhere so try to find unexplored region
             System.out.println("LANDEXP: ENQ UNEXPLORED LAND");
-            //presumably the present land block ahs been explored so rethink this logic..
-            this.agentEngine.enqueueUnexploredLand();
 
         }
 
         // if no pending actions, change state
-        if(this.agentEngine.hasGoal() || this.agentEngine.hasTreasure()) { //or has seen items??
+        if(this.agentEngine.hasGoal()) { //or has seen items??
             System.out.println("GOING INTO GOAL PURSUIT MODE");
             //System.out.println("PANIC");
             //System.exit(1);
             this.agentEngine.setAgentState(this.agentEngine.pursueGoal); 
             //System.out.println("DUMMY MOVE");
 
-        }else if(this.agentEngine.hasUnexploredWater() && this.agentEngine.hasAxe()){
+        }else if(this.agentEngine.hasAxe()){
 
             if(!this.agentEngine.isOnWater() && !this.agentEngine.hasRaft()) { 
 

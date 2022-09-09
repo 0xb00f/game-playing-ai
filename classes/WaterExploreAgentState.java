@@ -32,10 +32,12 @@ public class WaterExploreAgentState implements AgentState {
 
             // if no pending actions, change state
             if(this.agentEngine.hasGoal() || this.agentEngine.hasTreasure()) { //or has seen items??
+
                 System.out.println("GOING INTO GOAL PURSUIT MODE");
                 this.agentEngine.setAgentState(this.agentEngine.pursueGoal); //agentstate retrieves goal from gamestate
-                //System.exit(1);
-            }else if(this.agentEngine.hasUnexploredLand()){
+
+            }else if(true){ //placeholder
+
                 if(this.agentEngine.isOnWater()) {
 
                     System.out.println("GOIGN TO LAND");
@@ -51,7 +53,6 @@ public class WaterExploreAgentState implements AgentState {
                 System.out.println("PANIC");
                 System.exit(1);
 
-                //panic?
             }
 
         }

@@ -66,10 +66,12 @@ OBSTRUCTIONS ETC
 
 BOMB GOALS 
 - want add bombs as goals but not add multiple, when it is reached we want to floodfill to find nearest...
+- OR we add them and when one is selected, find the nearest
 
 STEPS
 1. get graph working (DONE!)
-2. floodfill find reachable items
-3. state transitions
+2. floodfill find reachable items (DONE!)
+3. state transitions (think about transition logic and edge cases!!!)
 4. obstrustions and terrain
-5. goal state and search logic
+5. goal state and search logic, dont need heuristics, clean up path logic....
+6. add item scoring to astar f value calculations (separate function)

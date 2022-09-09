@@ -17,43 +17,31 @@ public class SearchGameMap {
 
     }
 
-    /*
-     * USES:
-     * 1. to return location of nearest reachable raft, land, water (arg should be a char)
-     */
-    public int floodFill(GameMap map, GameNode node) { //char target
+    public GameNode reachableItem(GameMap map, char target) {
 
-        int nItems = 0;
         HashSet<GameNode> seen = new HashSet<GameNode>();
         ArrayDeque<GameNode> q = new ArrayDeque<GameNode>();
 
         q.push(this.state.getCurrNode());
-
-        //System.out.println("FLOODFILL: looking for node '"+node.getType()+"'");
 
         while(!q.isEmpty()) {
 
             GameNode curr = q.poll();
             seen.add(curr);
 
-            if(curr == node) { //match types
-                
-                return 1; //return node instead, for path planning
-
-            }
+            if(!curr.isVisited() && curr.getType() == target) return curr; //not visited in general, but especially for terrain
             
             for(GameNode next: map.getNeighbours(curr)) {
 
-                if(!seen.contains(next)) {
-                    if(node != null && (node.getType() == next.getType() || this.state.isValidTerrain(next.getType()))) q.add(next);
-                    if(next.isItem() || (this.state.hasAxe() && next.isTree())) q.add(next);
-                }
+                if(seen.contains(next) || next.outOfBounds(this.state)) continue;
+
+                q.add(next);
 
             }
 
         }
 
-        return nItems; //null
+        return null;
 
     }
 

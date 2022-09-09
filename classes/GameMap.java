@@ -76,31 +76,6 @@ public class GameMap {
         }
 
     }
-    /* 
-    private void printMap() { //del
-
-        System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-
-        for(int i=50; i < 150; i++) {
-            for(int j=50; j < 150; j++) {
-                if(this.map[i][j] == this.state.getCurrNode()) {
-                    System.out.print("^");
-                    continue;
-                }
-                System.out.print(this.map[i][j].getType());
-            }
-            System.out.println("");
-        }
-
-        System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-
-    }*/
-
-    public boolean sanity() {
-
-        return this.map.sanity();
-
-    }
     
     public void mapView(char[][] view) {
 
@@ -147,11 +122,6 @@ public class GameMap {
 
         }
 
-        //this.state.cleanUnexplored(); //del
-        //this.map.printPercept(this.state.getCurrNode());
-        //this.map.debugGraph();
-        //printMap();
-
     }
 
     // explore - does this return a goal or add it to be retrieved from state?
@@ -195,23 +165,9 @@ public class GameMap {
 
     }
 
-    public GameNode findReachable(char target) { //TO REPLACE THE TWO LOWER: rafts/unexplored
+    public GameNode findReachable(char target) { 
 
-        //GameNode result = this.search.floodFill(this,target);
-
-        return null;
-
-    }
-
-    public LinkedList<GameNode> reachable(GameNode n) { //del
-
-        return this.search.pathBFS(this, this.state.currentNode, n);
-
-    }
-
-    public boolean isReachable(GameNode n) { //del
-
-        return this.search.floodFill(this, n) > 0;
+        return this.search.reachableItem(this, target);
 
     }
 
