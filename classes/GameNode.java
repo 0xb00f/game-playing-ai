@@ -20,9 +20,10 @@ public class GameNode {
 
             case '$' : return -5;
             case 'a': case 'k': case 'd': return -1;
-            case ' ': case '~': return 1;
-            case '*': return 2;
-            case 'T': return 2;
+            case ' ': return 1;
+            case '~' : return 2;
+            case 'T': return 3;
+            case '*': return 4;
             default: return 100; //should never happen
 
         }
@@ -92,11 +93,10 @@ public class GameNode {
             case '.' : return true; 
             case '*' : return true;
             case '-' : return state.hasKey() == false;
-            case '~' : case ' ' : return state.isValidTerrain(this.nodeType) == false;
 
         }
 
-        return true; //shouldnt get here but dont want to go wherever triggers this
+        return false; 
 
     }
 
@@ -127,12 +127,6 @@ public class GameNode {
             default : return false;
 
         }
-
-    }
-
-    public boolean isTerrain() {
-
-        return this.nodeType == ' ' || this.nodeType == '~';
 
     }
     

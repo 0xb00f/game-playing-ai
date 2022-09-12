@@ -10,35 +10,42 @@ public class GoalPursuitAgentState implements AgentState {
 
     public void doTask(char[][] view) {
 
-        if(this.agentEngine.pursueGoal()) return;
+        System.out.println("IN GOALPURSUIT");
+        boolean success = false;
 
-        GameNode n = this.agentEngine.findReachableNode(' ');
-        if(n != null) { 
-            
-            System.out.println("GOAL MODE: changing state to land");
-            this.agentEngine.setAgentState(this.agentEngine.exploreLand);
+        if(this.agentEngine.hasGoal()) { 
+
+            System.out.println("IN GOALPURSUIT: PURSUING GOAL!");
+            success = this.agentEngine.pursueGoal();
 
         }
         
-        n = this.agentEngine.findReachableNode('~');
-        if(n != null && this.agentEngine.hasAxe()) {
+        if(!success){
 
-            //enable water travel
-            System.out.println("GOAL MODE: changing state to water");
-            this.agentEngine.enableLandTravel();
-            this.agentEngine.setAgentState(this.agentEngine.exploreWater);
+            //first try land exploration
+            GameNode n = this.agentEngine.findReachableNode(' ');
+            if(n != null) { 
+                
+                System.out.println("GOALPURSUIT: GOING INTO LAND EXPLORE");
+                this.agentEngine.setAgentState(this.agentEngine.transLand);
+                return;
 
-        }else{
-            
-            System.out.println("GOAL MODE: PANIC!");
-            System.exit(1);
+            }else if(this.agentEngine.hasAxe()){
+                
+                System.out.println("GOALPUSUIT: GOING INTO WATER EXPLORE!");
+                this.agentEngine.setAgentState(this.agentEngine.transWater);
+
+            }else{
+                
+                System.out.println("GOALPUSUIT: PANIC - AGENT LOST!");
+                System.exit(1);
+
+            }
 
         }
 
         return;
 
     }
-
-
 
 }

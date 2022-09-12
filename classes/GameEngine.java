@@ -95,7 +95,7 @@ public class GameEngine {
    private void print_map() throws InterruptedException {
       char ch=' ';
       int r,c;
-      //System.out.print("\033\143"); //hack
+      System.out.print("\033\143"); //hack
       System.out.println();
       Thread.sleep(10);
       for( r=0; r < nrows; r++ ) {

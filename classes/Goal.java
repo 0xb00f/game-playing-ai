@@ -70,22 +70,4 @@ public class Goal {
 
     }
 
-    public GameNode pathEnd() { //del
-
-        return this.path.peekLast();
-
-    }
-
-    public void setWater() { //del
-
-        crossWater = true;
-
-    }
-
-    public boolean crossesWater() { //del
-
-        return crossWater;
-
-    }
-
 }

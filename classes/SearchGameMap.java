@@ -10,14 +10,16 @@ import java.util.PriorityQueue;
 public class SearchGameMap {
     
     private GameState state;
+    private TerrainManager terrMngr;
 
-    public SearchGameMap(GameState state) {
+    public SearchGameMap(GameState state, TerrainManager tmngr) {
 
         this.state = state;
+        this.terrMngr = tmngr;
 
     }
 
-    public GameNode reachableItem(GameMap map, char target) {
+    public GameNode reachableItem(GameMap map, GameState state, char target) {
 
         HashSet<GameNode> seen = new HashSet<GameNode>();
         ArrayDeque<GameNode> q = new ArrayDeque<GameNode>();
@@ -29,11 +31,29 @@ public class SearchGameMap {
             GameNode curr = q.poll();
             seen.add(curr);
 
-            if(!curr.isVisited() && curr.getType() == target) return curr; //not visited in general, but especially for terrain
+            if(curr.getType() == target) {
+                
+                if(!curr.isVisited() || curr == map.getHome()) {
+
+                    return curr; //not visited in general, but especially for terrain
+
+                }
+            
+            }
             
             for(GameNode next: map.getNeighbours(curr)) {
 
-                if(seen.contains(next) || next.outOfBounds(this.state)) continue;
+                /*
+                 * separating the logic out in this guard:
+                 * seen - keeping track
+                 * gamenode - whether it is outofbounds
+                 * terrain - whether it is valid terrain for the agentstate
+                 */
+                if(seen.contains(next)) continue; // || next.outOfBounds(this.state)
+                if(!this.terrMngr.isValidTerrain(state, state.getAgentState(), next.getType())) {
+                    //System.out.println("FLOODFILL: terrain validity failed: '"+next.getType()+"'");
+                    continue;
+                }
 
                 q.add(next);
 
@@ -47,12 +67,8 @@ public class SearchGameMap {
 
     public LinkedList<GameNode> pathBFS(GameMap map, GameNode start, GameNode end) {
 
-        //if(!map.sanity()) System.exit(1); //debug
-
-        //MAP LOSING POSITION!!! tried chanigng to point here to no avail
-
         ArrayDeque<Goal> queue = new ArrayDeque<Goal>();
-        HashSet<Point> seen = new HashSet<Point>(); 
+        HashSet<Point> seen = new HashSet<Point>();  //change back
         Goal g = new Goal(start);
         queue.add(g);
 
@@ -67,17 +83,11 @@ public class SearchGameMap {
                 return curr.getPath();
 
             }
-            //System.out.println("BFS CURR NODE IS "+currNode.getPoint().toString()+" of type '"+currNode.getType()+"'");
-            //System.out.println("NEIGHBOURS ARE:");
-            //for(GameNode n : map.getNeighbours(currNode)) {
-              //  System.out.println("\t'"+n.getType()+"' at "+n.getPoint().toString());
-            //}
 
             for(GameNode n : map.getNeighbours(currNode)) {
 
-                if(seen.contains(n.getPoint())) continue;
-                if(n.outOfBounds(this.state)) continue;
-                //System.out.println("ENQ NEIGHBOUR "+n.getPoint().toString()+" of type '"+n.getType()+"'");
+                if(seen.contains(n.getPoint()) || n.outOfBounds(this.state) || !this.terrMngr.isValidTerrain(state, state.getAgentState(), n.getType())) continue; 
+
                 Goal next = new Goal(n);
                 next.extendPath(curr.getPath());
                 next.addToPath(n);
@@ -118,8 +128,6 @@ public class SearchGameMap {
         HashSet<GameNode> seen = new HashSet<GameNode>(); 
         LinkedList<GameNode> toExplore = new LinkedList<GameNode>();
 
-        //System.out.println("DFS STARTING FROM "+this.state.getCurrNode().getPoint().toString());
-
         toExplore.add(this.state.getCurrNode());
         stack.push(this.state.getCurrNode());
 
@@ -127,21 +135,23 @@ public class SearchGameMap {
 
             GameNode curr = stack.pop();
 
+            //System.out.println("EXPLORE GOING TO VISIT "+curr.getPoint().toString());
+
             if(!seen.contains(curr)) { 
 
                 seen.add(curr);
 
-                if(!curr.isVisited()) toExplore.add(curr); //shouldn't add curr node!
+                if(!curr.isVisited()) toExplore.add(curr); 
 
-                //System.out.println("EXPLORE: looking at neighbours of ndoe at "+curr.getPoint().toString());
+                //System.out.println("curr has "+map.getNeighbours(curr).size()+" neighbours");
 
                 for(GameNode n : map.getNeighbours(curr)) {
 
-                    //System.out.println("EXPLORE: checking node of type '"+n.getType()+"' outofbounds="+n.outOfBounds(this.state));
-
-                    if(seen.contains(n) || n.outOfBounds(this.state)) continue;
-
-                    //System.out.println("EXPLORING NODE TYPE '"+n.getType()+"'");
+                    if(seen.contains(n) || n.outOfBounds(this.state)) continue; 
+                    if(!this.terrMngr.isValidTerrain(state, state.getAgentState(), n.getType())) {
+                        //System.out.println("SEARCH: terrain validity failed");
+                        continue;
+                    }
 
                     stack.push(n);
 
@@ -155,23 +165,6 @@ public class SearchGameMap {
 
     }
 
-    // Astar - this will employ states and search over them STRATEGY
-    // it will figure out SEQUENCES of goals... these will be enqueued in state
-    // it is a deep search that may encompass multiple goals (e.g. get raft, open door, get bomb)
-
-    /*
-     * Do i want this to pursue a single goal, or find a path that generates multiple goals?
-     * first option simpler... but if a goal is across water we need to account for subgoals (or if bombs needed)
-     * always choose a path that makes the treasure easier to obtain... h = hValue - treasureCost?
-     */
-
-     /*
-      * one solution is that astar search is called, assesses seen goals by whether they are reachable, picks one 
-      * based on weight/reachability, extracting its path. THEN performs astar search to that goal, so the goal is 
-      * picked dynamically based on what is known. Goals do not involve trees, as they are a means to an end. There can be
-      * a method that picks the nearest tree and goes to collect it, inserted as a subgoal beforehand.  
-      */
-
     private class GoalStateCompare implements Comparator<GoalSearchState> {
 
         public int compare(GoalSearchState a, GoalSearchState b) {
@@ -179,48 +172,32 @@ public class SearchGameMap {
             Integer g1 = a.getF();
             Integer g2 = b.getF();
             
-            return g1.compareTo(g2); //??
+            return g1.compareTo(g2); 
             
         }
 
     }
 
-    /*
-     * possibly good idea to adapt this to pursue a list of goals, through them, to the last....
-     * means adapting heuristic to calculate the lowest cost path through ALL goals... if walls
-     * are increased cost this SHOULD take care of level 8 etc!!!!
-     */
-    
     public Goal astarSearch(GameMap map, GameNode end, Heuristic h) {
 
         System.out.println("ASTAR: start on goal with type '"+end.getType()+"' at "+end.getPoint().toString());
 
         PriorityQueue<GoalSearchState> open = new PriorityQueue<GoalSearchState>(new GoalStateCompare());
         HashSet<GameNode> closed = new HashSet<GameNode>();
-        //HashMap<GoalSearchState,GoalSearchState> parent = new HashMap<GoalSearchState,GoalSearchState>(); //neded?
-        //HashMap<GoalSearchState,Integer> gValues = new HashMap<GoalSearchState,Integer>(); //needed?
         HashMap<GameNode,Integer> fValues = new HashMap<GameNode,Integer>();
 
         GameNode startNode = this.state.getCurrNode();
         GoalSearchState start = new GoalSearchState(null,startNode);
 
-        start.setState(this.state);
+        start.initState(this.state); //initState
         start.setG(startNode.nodeWeight());
-        start.setH(h.score(start.getState(), startNode, end));
+        start.setH(h.score(startNode, end)); //this.state
         open.add(start);
-        //gValues.put(start, 0);
-        fValues.put(start.getNode(),start.getG()+h.score(start.getState(), startNode, end));
-        //parent.put(start,null);
-        int maxIters = 0;
+        fValues.put(start.getNode(),start.getG()+h.score(startNode, end));
 
         while(!open.isEmpty()) {
 
-            //if(maxIters == 9999) System.out.println("MaxIters fail");
-
-            //for(GoalSearchState x: open) System.out.println("PQ: '"+x.getNode().getType()+"' with weight "+x.getF()+" at "+x.getNode().getPoint().toString());
-
             GoalSearchState curr = open.poll();
-            //System.out.println("ASTAR visiting '"+curr.getNode().getType()+"' at "+curr.getNode().getPoint().toString());
             closed.add(curr.getNode());
 
             // we're at the goal 
@@ -234,6 +211,7 @@ public class SearchGameMap {
                     curr = curr.getPrev();   
 
                 }
+
                 System.out.println("ASTAR SUCCESS");
                 Goal g = new Goal(end);
                 g.extendPath(path);
@@ -244,16 +222,12 @@ public class SearchGameMap {
             // look at successors
             for(GoalSearchState next: curr.genSuccessors(map)) {
 
-                //if(closed.contains(next.getNode())) continue;
-
-                int tmpF = curr.getG() + next.getNode().nodeWeight() + h.score(curr.getState(),next.getNode(),end); //all equal edges UNLESS GOING THROUGH A WALL
+                int tmpF = curr.getG() + next.getNode().nodeWeight() + h.score(next.getNode(),end); //separate function once item logic in place...
                 
                 if(tmpF < fValues.getOrDefault(next.getNode(), Integer.MAX_VALUE)) {
 
-                    //parent.put(next,curr); //needed if state not node, and path in state?
-                    //gValues.put(next,curr.getG()+1);
                     next.setG(curr.getG() + next.getNode().nodeWeight());
-                    next.setH(h.score(curr.getState(),next.getNode(),end));
+                    next.setH(h.score(next.getNode(),end));
                     fValues.put(next.getNode(),tmpF);
                     open.add(next);
 
@@ -262,8 +236,9 @@ public class SearchGameMap {
             }
 
         }
+
         System.out.println("ASTAR FAILED to go to '"+end.getType()+"'");
-        return null; //goal unreachable
+        return null; 
 
     }
     

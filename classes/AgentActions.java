@@ -114,7 +114,7 @@ public class AgentActions {
 
     }
 
-    public void goToGoal(Goal g) {
+    public void goToGoal(Goal g) { //do prior sanity check to ensure all adjacent
 
         GameNode prev = this.state.getCurrNode();
         int vdir = this.state.getDirection();

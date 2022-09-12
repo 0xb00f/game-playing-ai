@@ -1,18 +1,13 @@
 import java.util.Comparator;
+import java.util.PriorityQueue;
 
 public class GoalManager {
 
-    //private PriorityQueue<GameNode> pendingGoals; 
-    private AgentActions actions;
-    private GameMap map;
-    private GameState state;
+    private PriorityQueue<GameNode> pendingGoals; 
 
-    public GoalManager(AgentActions a, GameMap m, GameState s) {
+    public GoalManager() {
 
-        //this.pendingGoals = new PriorityQueue<GameNode>(new GoalCompare());
-        this.actions = a;
-        this.map = m;
-        this.state = s;
+        this.pendingGoals = new PriorityQueue<GameNode>(new GoalCompare());
 
     }
 
@@ -22,7 +17,7 @@ public class GoalManager {
     
             Integer g1 = a.goalWeight();
             Integer g2 = b.goalWeight();
-            
+
             return g1.compareTo(g2);
             
         }
@@ -31,61 +26,60 @@ public class GoalManager {
     
     public boolean hasGoal() {
 
-        return this.state.pendingGoals.size() > 0; //remove state
+        return this.pendingGoals.size() > 0; 
 
     }
 
-    public void addGoal(GameNode g) {
+    public void addGoal(GameNode n) {
 
-        this.state.addGoal(g); //now local
+        if(this.pendingGoals.contains(n)) return;
+        System.out.println("ADDING GOAL '"+n.getType()+"' at "+n.getPoint().toString());
+        this.pendingGoals.add(n); 
+
+    }
+
+    public void removeGoal(GameNode n) {
+
+        System.out.println("REMOVING GOAL '"+n.getType()+"'");
+
+        this.pendingGoals.remove(n);
 
     }
 
     public GameNode getNextGoal() {
 
-        return this.state.pendingGoals.poll(); //remove state
+        System.out.println("DEQUEUING GOAL '"+this.pendingGoals.peek().getType()+"'");
+
+        return this.pendingGoals.poll(); 
 
     }
     
-    public boolean pursueGoal() { 
-
-        /*
-         * overall logic
-         * NOTE: home goal auto added when treaure collected, so just need to pursue goal
-         * -if there is a goal, pursue it
-         * -if that fails, see if an item is reachable and pursue that if so
-         * -return otherwise
-         */
+    public boolean pursueGoal(GameMap map, AgentActions actions) { 
 
         GameNode n = null;
 
-        if(this.hasGoal()) n = this.getNextGoal();
+        if(this.hasGoal()) { 
+        
+            //peek goal first see if next goal reachable...
+            GameNode next = this.pendingGoals.peek();
+            if(map.findReachable(next.getType()) == null) { 
+                System.out.println("GOAL OF TYPE '"+next.getType()+"' AT "+next.getPoint().toString()+" IS NOT REACHBLE!!!!!!!!!!!!!");
+                return false;    
+            }
+
+            n = this.getNextGoal();
+            System.out.println("GOAL OF TYPE '"+n.getType()+"' AT "+n.getPoint().toString()+" IS REACHBLE");
+
+        }
 
         if(n != null) {
 
-            Goal g = this.map.pursueGoal(n);
+            Goal g = map.pursueGoal(n); 
 
             if(g != null) {
 
-                this.actions.goToGoal(g);
+                actions.goToGoal(g); 
                 return true;
-
-            }
-
-        }else{
-
-            //see if an item is reachable
-            n = this.map.findReachable('d');
-            if(n != null) {
-
-                Goal g = this.map.pursueGoal(n);
-
-                if(g != null) {
-
-                    this.actions.goToGoal(g);
-                    return true;
-
-                }
 
             }
 
@@ -94,12 +88,5 @@ public class GoalManager {
         return false;
 
     }
-
-    //late night stoned idea...
-    /*
-     * path-clearing heuristic that, every time a tree or piece of wall or something not
-     * terrain is removed, counts the amount of goals now reachable because of that removed node
-     * if a new item is reachable by removing it, its a lower-cost path! 
-     */
     
 }

@@ -8,70 +8,32 @@ public class LandExploreAgentState implements AgentState {
 
     }
 
-    /*
-     * !!!!!!!!!!!!!!!!!!!!!!!LOGIC IN THESE STATES!!!!
-     * THINK ABOUT OVERALL LOGIC HERE - PANIC on s6!!! (also shits itself on s4, as goes for $ before d.... powering trees would solve but..)
-     * - want to make sure on land already...
-     */
-
     public void doTask(char[][] view) {
 
         System.out.println("IN LAND EXPLORE");
 
-        // enqueue actions to exlpore
         Goal g = this.agentEngine.exploreLand(); 
 
-        /*
-         * enabling water somewhere???
-         */
-
         if(g.hasPath()) {
-            System.out.println("LANDEXP: ENQ GOAL ACTIONS");
+
             this.agentEngine.addGoalActions(g);
-            return;
 
-        }else{
+        }else if(this.agentEngine.hasGoal()) { 
 
-            //explore failed to go anywhere so try to find unexplored region
-            System.out.println("LANDEXP: ENQ UNEXPLORED LAND");
-
-        }
-
-        // if no pending actions, change state
-        if(this.agentEngine.hasGoal()) { //or has seen items??
-            System.out.println("GOING INTO GOAL PURSUIT MODE");
-            //System.out.println("PANIC");
-            //System.exit(1);
-            this.agentEngine.setAgentState(this.agentEngine.pursueGoal); 
-            //System.out.println("DUMMY MOVE");
+            System.out.println("LANEXP: GOING INTO GOAL PURSUIT MODE");
+            this.agentEngine.setAgentState(this.agentEngine.transGoal); 
 
         }else if(this.agentEngine.hasAxe()){
 
-            if(!this.agentEngine.isOnWater() && !this.agentEngine.hasRaft()) { 
+            System.out.println("LANDEXP: GOING INTO WATER EXPLORE MODE");
+            this.agentEngine.setAgentState(this.agentEngine.transWater);
 
-                System.out.println("WATER EXPLORE: GETTING RAFT");
-    
-                // fetch raft if not in possession
-                if(!this.agentEngine.hasRaft()) {
-                    
-                    this.agentEngine.getRaft(); 
-                    this.agentEngine.enableWaterTravel();
-                    this.agentEngine.goToWater();
-
-                }
-            }
-
-            System.out.println("GOING INTO WATER EXPLORE MODE");
-            //enable water travel
-            this.agentEngine.setAgentState(this.agentEngine.exploreWater);
         }else{
-            System.out.println("PANIC");
+
+            System.out.println("LANDEXP: PANIC - AGENT IS LOST!");
             System.exit(1);
 
-            //panic?
         }
-
-        return;
 
     }
 

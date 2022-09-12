@@ -13,7 +13,6 @@ public class Graph {
 
         this.graph = new HashMap<GameNode,LinkedList<GameNode>>();
         this.pointDict = new HashMap<Point,GameNode>();
-
         this.home = new GameNode(0, 0);
         this.addNode(this.home);
 
@@ -25,21 +24,18 @@ public class Graph {
 
     }
 
-    //point exists
     public boolean pointExists(Point p) {
 
         return this.pointDict.containsKey(p);
 
     }
 
-    //does node exist
     public boolean nodeExists(GameNode n) {
 
         return this.graph.containsKey(n);
 
     }
 
-    //add vertex
     public void addNode(GameNode n) {
 
         if(this.nodeExists(n)) return;
@@ -57,7 +53,6 @@ public class Graph {
 
     }
 
-    //add edge between two vertices
     public void addEdge(GameNode n, GameNode m) {
 
         this.graph.get(n).add(m);
@@ -65,7 +60,6 @@ public class Graph {
 
     }
 
-    //return all neighbours
     public LinkedList<GameNode> getAllNeighbours(GameNode n) {
 
         return this.graph.get(n);
@@ -82,22 +76,17 @@ public class Graph {
 
         GameNode m = null;
 
-        //north
         m = this.getNorthNeighbour(n);
         if(m != null && !this.edgeExists(n, m)) this.addEdge(m, n);
-        //south
         m = this.getSouthNeighbour(n);
         if(m != null && !this.edgeExists(n, m)) this.addEdge(m, n);
-        //east
         m = this.getEastNeighbour(n);
         if(m != null && !this.edgeExists(n, m)) this.addEdge(m, n);
-        //west
         m = this.getWestNeighbour(n);
         if(m != null && !this.edgeExists(n, m)) this.addEdge(m, n);
 
     }
 
-    //return north neighbour
     public GameNode getNorthNeighbour(GameNode n) {
 
         Point currP = n.getPoint();
@@ -110,7 +99,6 @@ public class Graph {
 
     }
 
-    //return south neighbour
     public GameNode getSouthNeighbour(GameNode n) {
 
         Point currP = n.getPoint();
@@ -123,7 +111,6 @@ public class Graph {
 
     }
 
-    //return east neighbour
     public GameNode getEastNeighbour(GameNode n) {
 
         Point currP = n.getPoint();
@@ -136,7 +123,6 @@ public class Graph {
 
     }
 
-    //return west neighbour
     public GameNode getWestNeighbour(GameNode n) {
 
         Point currP = n.getPoint();
@@ -148,6 +134,5 @@ public class Graph {
         return null;
 
     }
-
 
 }

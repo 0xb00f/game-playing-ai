@@ -3,6 +3,9 @@ public class AgentEngine {
     public AgentState exploreLand;
     public AgentState exploreWater;
     public AgentState pursueGoal;
+    public AgentState transLand;
+    public AgentState transWater;
+    public AgentState transGoal;
     private AgentState currentState;
     private AgentActions actions;
     private GameState state;
@@ -16,15 +19,16 @@ public class AgentEngine {
         this.exploreLand = new LandExploreAgentState(this);
         this.exploreWater = new WaterExploreAgentState(this);
         this.pursueGoal = new GoalPursuitAgentState(this);
+        this.transLand = new TransitionToLandExplore(this);
+        this.transWater = new TransitionToWaterExplore(this);
+        this.transGoal = new TransitionToGoalPursuit(this);
         this.currentState = this.exploreLand;
-        this.state = new GameState(); 
-        this.state.setAgentState(this.currentState);
-        this.map = new GameMap(this.state);
+        this.state = new GameState(this.currentState); 
+        this.terrMngr = new TerrainManager(this.exploreLand, this.exploreWater, this.pursueGoal);
+        this.map = new GameMap(this.state, new SearchGameMap(this.state, this.terrMngr));
         this.actions = new AgentActions(this.state);
-        this.goalMngr = new GoalManager(this.actions, this.map, this.state);
-        this.terrMngr = new TerrainManager(this.state, this.exploreLand, this.exploreWater, this.pursueGoal);
-        this.state.setTerrainManager(this.terrMngr); //del
-        this.state.enableLandTravel(); 
+        this.goalMngr = new GoalManager();
+        
         this.state.setCurrNode(this.map.getHome());
         
     }
@@ -37,7 +41,7 @@ public class AgentEngine {
             while(!this.hasNextAction()) this.currentState.doTask(view);
         }
         
-        Character c = this.getAgentAction();
+        Character c = this.actions.getNextAction();
         this.processAction(c);
         return c;
 
@@ -52,37 +56,38 @@ public class AgentEngine {
     public void setAgentState(AgentState newState) {
 
         this.currentState = newState;
-        this.state.setAgentState(newState); //needed? terrain mngr here now... can pass state as arg
+        this.state.setAgentState(newState); 
+        //terr?
 
     }
 
-    public boolean pursueGoal() { //del?
+    public void addGoal(GameNode n) {
 
-        return this.goalMngr.pursueGoal();
+        this.goalMngr.addGoal(n);
 
     }
 
-    public boolean hasGoal() { //del?
+    public boolean pursueGoal() { 
+
+        return this.goalMngr.pursueGoal(this.map,this.actions);
+
+    }
+
+    public boolean hasGoal() { 
 
         return this.goalMngr.hasGoal();
 
     }
 
-    public boolean hasTreasure() {
+    public boolean hasTreasure() { //del
 
         return this.state.hasTreasure();
 
     }
 
-    public GameNode getNextGoal() { //del?
-
-        return this.goalMngr.getNextGoal();
-
-    }
-
     public void mapView(char[][] view) {
 
-        this.map.mapView(view);
+        this.map.mapView(view,this.goalMngr);
 
     }
 
@@ -98,64 +103,13 @@ public class AgentEngine {
 
     }
 
-    public void enableWaterTravel() {
-
-        this.state.enableWaterTravel();
-
-    }
-
-    public void disableWaterTravel() {
-
-        this.state.disableWaterTravel();
-
-    }
-
-    public void enableLandTravel() {
-
-        this.state.enableLandTravel();
-
-    }
-
-    public void disableLandTravel() {
-
-        this.state.disableLandTravel();
-
-    }
-
     public boolean hasNextAction() {
 
         return this.actions.hasNextAction();
 
     }
 
-    public Character getAgentAction() {
-
-        return this.actions.getNextAction();
-
-    }
-
-    public void updateCurrState(GameNode node) { //new
-
-        switch(node.getType()) {
-
-            case 'k' : this.state.setKey(); break;
-            case 'd' : this.state.addBomb(); break;
-            case 'a' : this.state.setAxe(); break;
-            case '$' : {
-                this.state.setTreasure(); 
-                this.state.addGoal(this.map.getHome());
-                break;
-            }
-
-        }
-
-        //if(node.isItem() && this.pendingGoals.contains(node)) this.pendingGoals.remove(node);
-        if(node.getType() != '~') node.clearNode();
-        node.setVisited();
-
-    }
-
-    public void processAction(Character c) { //new
+    public void processAction(char c) { //new
 
         switch(c) {
 
@@ -163,7 +117,7 @@ public class AgentEngine {
             case 'l': this.state.turnDirection(-1); break;
             case 'r': this.state.turnDirection(1); break;
             case 'b': this.state.useBomb(); break;
-            case 'c': this.terrMngr.raftCollected(); break;
+            case 'c': this.state.setRaft(true); break; //terr at all?
 
         }
 
@@ -178,22 +132,22 @@ public class AgentEngine {
 
             case 0: 
                 GameNode north = graph.getNorthNeighbour(curr);
-                this.terrMngr.processTerrainChange(north.getType());
+                this.terrMngr.processTerrainChange(this.state,curr,north.getType());
                 this.state.setCurrNode(north);
                 break;
             case 1:
                 GameNode east = graph.getEastNeighbour(curr);
-                this.terrMngr.processTerrainChange(east.getType());
+                this.terrMngr.processTerrainChange(this.state,curr,east.getType());
                 this.state.setCurrNode(east);
                 break;
             case 2:
                 GameNode south = graph.getSouthNeighbour(curr);
-                this.terrMngr.processTerrainChange(south.getType());
+                this.terrMngr.processTerrainChange(this.state,curr,south.getType());
                 this.state.setCurrNode(south);
                 break;
             case 3:
                 GameNode west = graph.getWestNeighbour(curr);
-                this.terrMngr.processTerrainChange(west.getType());
+                this.terrMngr.processTerrainChange(this.state,curr,west.getType());
                 this.state.setCurrNode(west);
                 break;
 
@@ -201,7 +155,7 @@ public class AgentEngine {
 
     }
 
-    public void addGoalActions(Goal g) { //??
+    public void addGoalActions(Goal g) { 
 
         this.actions.goToGoal(g);
 
@@ -219,27 +173,33 @@ public class AgentEngine {
 
     }
 
-    public boolean getRaft() { //edit
+    public boolean hasKey() {
 
-        return false;//this.goalMngr.getRaft();
+        return this.state.hasKey();
+
+    }
+
+    public void setRaft(boolean b) {
+
+        this.state.setRaft(b);
 
     }
 
     public boolean isOnWater() {
 
-        return this.state.isOnWater(); //isOnWater()
+        return this.state.isOnWater(); 
 
     }
 
-    public boolean goToWater() { //edit
- 
-        return false; //this.goalMngr.goToWater();
+    public void setOnWater() {
+
+        this.state.setOnWater(); //terr
 
     }
 
-    public boolean goToLand() { //edit
+    public void setOffWater() {
 
-        return false; //this.goalMngr.goToLand();
+        this.state.setOffWater(); //as above
 
     }
 

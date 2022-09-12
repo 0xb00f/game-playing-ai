@@ -1,25 +1,108 @@
-import java.awt.Point;
 import java.util.LinkedList;
 
 public class GoalSearchState {
     
-    private GameState localState;
     private GoalSearchState prev;
     private GameNode node;
     private int hValue; 
     private int gValue; //path cost
 
     //TO ADD - remove localstate
-    //hasraft
-    //haskey
-    //nbombs
-    //onwater
+    private boolean hasTreasure;
+    private boolean hasAxe;
+    private boolean hasRaft;
+    private boolean hasKey;
+    private boolean onWater;
+    private int nBombs;
 
-    public GoalSearchState(GoalSearchState prev, GameNode node) {
+    public GoalSearchState(GoalSearchState prev, GameNode node) { //two constructors?
 
-        this.localState = null;
         this.prev = prev;
         this.node = node;
+
+        if(prev != null) this.setState(prev);
+
+    }
+
+    public void initState(GameState state) { //works initially but what about in searching???
+
+        this.hasTreasure = state.hasTreasure();
+        this.hasAxe = state.hasAxe();
+        this.hasKey = state.hasKey();
+        this.hasRaft = state.hasRaft();
+        this.onWater = state.isOnWater();
+        this.nBombs = state.getNumBombs();
+
+    }
+
+    public void setState(GoalSearchState state) { //above fix?
+
+        this.hasTreasure = state.hasTreasure();
+        this.hasAxe = state.hasAxe();
+        this.hasKey = state.hasKey();
+        this.hasRaft = state.hasRaft();
+        this.onWater = state.isOnWater();
+        this.nBombs = state.getNumBombs();
+
+    }
+
+    public boolean hasAxe() {
+
+        return this.hasAxe;
+
+    }
+
+    public void setAxe() {
+
+        this.hasAxe = true;
+
+    }
+
+    public boolean hasKey() {
+
+        return this.hasKey;
+
+    }
+
+    public void setKey() {
+
+        this.hasKey = true;
+
+    }
+
+    public boolean hasRaft() {
+
+        return this.hasRaft;
+
+    }
+
+    public void setRaft(boolean b) {
+
+        this.hasRaft = b;
+
+    }
+
+    public boolean hasBomb() {
+
+        return this.nBombs > 0;
+
+    }
+
+    public int getNumBombs() { 
+
+        return this.nBombs;
+
+    }
+
+    public void addBomb() {
+
+        this.nBombs++;
+
+    }
+
+    public void useBomb() {
+
+        this.nBombs--;
 
     }
 
@@ -59,29 +142,47 @@ public class GoalSearchState {
 
     }
 
-
-    public void setState(GameState state) {
-
-        this.localState = state.cloneState(this.node);
-
-    }
-
-    public GameState getState() {
-
-        return this.localState;
-
-    }
-
     public GameNode getNode() {
 
         return this.node;
 
     }
 
-    private boolean updateStateOnMove(GameNode next, GameState nextstate) {
+    public boolean isOnWater() {
+
+        return this.onWater;
+
+    }
+
+    public void setOnWater() {
+
+        this.onWater = true;
+
+    }
+
+    public void setOffWater() {
+
+        this.onWater = false;
+
+    }
+
+    public boolean hasTreasure() {
+
+        return this.hasTreasure;
+
+    }
+
+    public void setTreasure() {
+
+        this.hasTreasure = true;
+
+    }
+
+    private boolean updateStateOnMove(GameNode next, GoalSearchState nextstate) { //edit
 
         switch(next.getType()) {
 
+            case '-': return nextstate.hasKey();
             case 'k': nextstate.setKey(); return true;
             case 'd': nextstate.addBomb(); return true;
             case '*': 
@@ -98,17 +199,28 @@ public class GoalSearchState {
                 
                 if(nextstate.hasAxe()) {
                     nextstate.setRaft(true); 
-                    return true; //power through trees? what if they're needed?
+                    return true; //power through trees pursuing goal
                 }else{
                     return false;
                 }
-            case '~' : return nextstate.hasRaft(); //changed these after terrain mngr.... might wanna come back, clone if probs
-            case ' ' : {
+
+            case '~' : 
+
+                if(nextstate.hasRaft()) {
+                    nextstate.setOnWater();
+                    return true;
+                }else{
+                    return false;
+                }
+
+            case ' ' : 
+
                 if(nextstate.isOnWater()) {
                     nextstate.setRaft(false);
+                    nextstate.setOffWater();
                 }
                 return true; //if onwater, disable raft, return true
-            }
+
             case '$' : nextstate.setTreasure(); return true;
             default : return false;
 
@@ -121,51 +233,51 @@ public class GoalSearchState {
 
         LinkedList<GoalSearchState> ret = new LinkedList<GoalSearchState>();
         GameNode currNode = this.node;
-        Point p = currNode.getPoint();
-        int x = p.x, y = p.y;
 
         Graph m = map.getMap();
 
         //north
         GameNode north = m.getNorthNeighbour(currNode);
-        GameState northState = this.localState.cloneState(north);
+        GoalSearchState northState = new GoalSearchState(this, north);
         if(north != null && updateStateOnMove(north,northState)) {
-            GoalSearchState nextNorth = new GoalSearchState(this, north);
-            nextNorth.setG(this.gValue + north.nodeWeight());
-            nextNorth.setState(northState);
-            ret.add(nextNorth);
+
+            northState.setG(this.gValue + north.nodeWeight()); //this si done in searchmap....
+            ret.add(northState);
+
         }
 
         //south
         GameNode south = m.getSouthNeighbour(currNode);
-        GameState southState = this.localState.cloneState(south);
-        if(south != null &&updateStateOnMove(south,southState)) {
-            GoalSearchState nextSouth = new GoalSearchState(this, south);
-            nextSouth.setState(southState);
-            ret.add(nextSouth);
+        GoalSearchState southState = new GoalSearchState(this, south);
+        if(south != null && updateStateOnMove(south,southState)) {
+
+            southState.setG(this.gValue + south.nodeWeight());
+            ret.add(southState);
+
         }
 
         //east
         GameNode east = m.getEastNeighbour(currNode);
-        GameState eastState = this.localState.cloneState(east);
+        GoalSearchState eastState = new GoalSearchState(this, east);
         if(east != null && updateStateOnMove(east,eastState)) {
-            GoalSearchState nextEast = new GoalSearchState(this, east);
-            nextEast.setState(eastState);
-            ret.add(nextEast);
+
+            eastState.setG(this.gValue + east.nodeWeight());
+            ret.add(eastState);
+
         }
 
         //west
         GameNode west = m.getWestNeighbour(currNode);
-        GameState westState = this.localState.cloneState(west);
+        GoalSearchState westState = new GoalSearchState(this, west);
         if(west != null && updateStateOnMove(west,westState)) {
-            GoalSearchState nextWest = new GoalSearchState(this, west);
-            nextWest.setState(westState);
-            ret.add(nextWest);
+
+            westState.setG(this.gValue + west.nodeWeight());
+            ret.add(westState);
+
         }
 
         return ret;
 
     }
-
 
 }

@@ -1,33 +1,26 @@
-import java.util.HashSet;
-
 public class TerrainManager {
 
-    private GameState state;
     private AgentState landExplore;
     private AgentState waterExplore;
     private AgentState goalPursuit;
-    private HashSet<Character> validTerrain;
-    //private boolean onWater;
 
-    public TerrainManager(GameState s, AgentState l, AgentState w, AgentState g) {
+    public TerrainManager(AgentState l, AgentState w, AgentState g) {
 
-        this.state = s;
         this.landExplore = l;
-        this.waterExplore = w;
+        this.waterExplore = w; 
         this.goalPursuit = g;
-        this.validTerrain = new HashSet<Character>();
 
     }
 
-    public boolean isValidTerrain(AgentState currState, char c) {
+    public boolean isValidTerrain(GameState state, AgentState currState, char c) { //gamestate arg
 
         if(currState == this.landExplore) {
 
             switch(c) {
 
                 case ' ' : return true;
-                case '~' : return false; //this.state.isOnWater();
-                case 'a' : case 'k' : case 'd' : case '$' : case '-' : case 'T' : return true;
+                case '-' : return state.hasKey();
+                case 'a' : case 'k' : case 'd' : case '$' : return true; //T????????
                 default : return false;
 
             }
@@ -36,89 +29,43 @@ public class TerrainManager {
 
             switch(c) {
 
-                case ' ' : return false; //return this.state.isOnWater() == false;
                 case '~' : return true;
                 default : return false;
 
             }
 
-        }else if(currState == this.goalPursuit) {
+        }else{ //catch all?
 
             switch(c) {
 
                 case ' ' : return true;
-                case '~' : return this.state.hasRaft();
-                case '-' : return this.state.hasKey();
-                case 'a' : case 'k' : case 'd' : case '$' : return true;
+                case '*' : return state.hasBomb();
+                case '~' : return state.hasRaft(); //kinda needed
+                case '-' : return state.hasKey(); //as above, BUT can pass state as arg?
+                case 'T' : return state.hasAxe();
+                case 'a' : case 'k' : case 'd' : case '$' : return true; //pursue thorugh trees
                 default : return false;
 
             }
 
         }
 
-        return false;
-
     }
 
-    public void raftCollected() {
+    public void processTerrainChange(GameState state, GameNode curr, char nextTerrain) { //can pass state in to toggle things!!!!
 
-        this.state.setRaft(true);
-        this.enableWaterTravel();
-
-    }
-
-    public void processTerrainChange(char nextTerrain) {
-
-        char currTerrain = this.state.getCurrNode().getType();
+        char currTerrain = curr.getType();
 
         if(currTerrain == '~' && nextTerrain == ' ') { 
 
-            this.disableWaterTravel();
-            this.enableLandTravel();
-            this.state.setRaft(false);
-            this.setOffWater();
+            state.setRaft(false); //arg state
+            state.setOffWater(); //shifting onwater in here soon...
 
-        }else if(currTerrain == ' ' && nextTerrain == '~') { //water travel enabled when collecting axe
+        }else if(currTerrain == ' ' && nextTerrain == '~') { 
 
-            this.setOnWater();
+            state.setOnWater(); //as above
             
         }
-
-    }
-
-    public void enableWaterTravel() {
-
-        this.validTerrain.add('~');
-
-    }
-
-    public void enableLandTravel() {
-
-        this.validTerrain.add(' ');
-
-    }
-
-    public void disableWaterTravel() {
-
-        this.validTerrain.remove('~');
-
-    }
-
-    public void disableLandTravel() {
-
-        this.validTerrain.remove(' ');
-
-    }
-
-    public void setOnWater() {
-
-        this.state.setOnWater();
-
-    }
-
-    public void setOffWater() {
-
-        this.state.setOffWater();
 
     }
     

@@ -18,6 +18,18 @@ WATER TRAVEL
 - when in water explore mode
 ---crossing land when on water should lead to dead end in A* state search as cant continue...
 
+STATE LOGIC 
+*land explore (starts out on land)
+-go into explore function, if it returns actions, follow them
+-failing the above, if there is a goal go into goal pursuit, failing that if has axe go into water explore
+*water explore (starts out on water)
+-as above essentiall, except if there is unexplored land, go there
+*goal pursuit
+-pursue a goal if there is one, if that results in actions do them
+-if there's no goal or no actions from the only goal there, see if fetching a raft will help 
+(enqueu that goal and return without change state - while loop)
+-if still nothing, go to other states
+
 STATE TRANSITIONS
 *Land explore -> water explore
 - if no raft, first get raft before transitioning to water explore
@@ -43,7 +55,7 @@ WATER EXPLORE STATE
 - simply explore all reachable water that does not require crossing land, strict water-only state
 - if no more water left, transition:
 1. go into goal pursuit if there exists a goal
-2. go to land if there exists reachable unexplored land (go to land first)
+2. go to land if there exists reachable unexplored land S
 
 GOAL PURSUIT STATE
 - if there is a goal, deque it, and pursue it
@@ -68,10 +80,18 @@ BOMB GOALS
 - want add bombs as goals but not add multiple, when it is reached we want to floodfill to find nearest...
 - OR we add them and when one is selected, find the nearest
 
+TERRAIN 
+-all terrain changes occur with state changes, or collecting of rafts, or on stepping off water
+
 STEPS
 1. get graph working (DONE!)
 2. floodfill find reachable items (DONE!)
-3. state transitions (think about transition logic and edge cases!!!)
-4. obstrustions and terrain
+3. state transitions (DONE! i think...)
+4. obstructions and terrain mngr
 5. goal state and search logic, dont need heuristics, clean up path logic....
 6. add item scoring to astar f value calculations (separate function)
+
+TODO
+1. bomb goal logic...
+2. configure goalmngr for all goals
+3. 
