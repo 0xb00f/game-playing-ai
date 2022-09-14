@@ -10,6 +10,7 @@ public class TransitionToWaterExplore implements AgentState {
 
     public void doTask(char[][] view) {
 
+        System.out.println("IN TRANSIITON TO WATER");
 
         if(!this.agentEngine.hasRaft()) {
 
@@ -37,9 +38,7 @@ public class TransitionToWaterExplore implements AgentState {
             System.out.println("TRANS WATER: GOING TO WATER");
 
             //floodfill find unexplored water
-            this.agentEngine.setAgentState(this.agentEngine.pursueGoal); //hack booooo
             GameNode waterNode = this.agentEngine.findReachableNode('~');
-            this.agentEngine.setAgentState(this.agentEngine.exploreLand); 
             //enqueue actions if found otherwise panic
             if(waterNode == null) {
 

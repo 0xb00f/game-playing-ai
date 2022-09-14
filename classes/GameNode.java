@@ -14,6 +14,29 @@ public class GameNode {
 
     }
 
+    @Override
+    public boolean equals(Object x) {
+
+        Point curr = this.pos;
+        if(x instanceof GameNode) {
+
+            GameNode cand = (GameNode)x;
+            Point other = cand.getPoint();
+            return curr.equals(other);
+
+        }
+
+        return false;
+
+    }
+
+    @Override
+    public int hashCode() {
+
+        return this.pos.hashCode();
+
+    }
+
     public int nodeWeight() {
 
         switch(this.nodeType) {
@@ -34,8 +57,9 @@ public class GameNode {
 
         switch(this.nodeType) {
 
+            case ' ' : case '~' : case 'T' : return 0;
             case 'a': return 1;
-            case 'T': return 2;
+            //case 'T': return 2;
             case 'k': return 3;
             case 'd': return 4;
             case '$': return 5; 

@@ -66,7 +66,7 @@ public class Graph {
 
     }
 
-    private boolean edgeExists(GameNode n, GameNode m) {
+    public boolean edgeExists(GameNode n, GameNode m) {
 
         return this.graph.get(n).contains(m) && this.graph.get(m).contains(n);
 

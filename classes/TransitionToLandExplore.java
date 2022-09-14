@@ -12,7 +12,7 @@ public class TransitionToLandExplore implements AgentState {
 
         System.out.println("IN TRANSIITON TO LAND");
 
-        if(this.agentEngine.isOnWater()) {
+        //if(this.agentEngine.isOnWater()) {
 
             GameNode landNode = this.agentEngine.findReachableNode(' ');
 
@@ -23,11 +23,11 @@ public class TransitionToLandExplore implements AgentState {
 
             }
 
-            System.out.println("TRANSIITON LAND: FOUND LAND!");
+            //System.out.println("TRANSIITON LAND: FOUND LAND AT "+landNode.getPoint().toString()+" visited="+landNode.isVisited());
             this.agentEngine.addGoal(landNode);
             this.agentEngine.pursueGoal();
         
-        }
+        //}
 
         this.agentEngine.setAgentState(this.agentEngine.exploreLand);
 

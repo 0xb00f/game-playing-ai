@@ -34,7 +34,7 @@ public class TerrainManager {
 
             }
 
-        }else{ //catch all?
+        }else if(currState == this.goalPursuit) { 
 
             switch(c) {
 
@@ -44,6 +44,20 @@ public class TerrainManager {
                 case '-' : return state.hasKey(); //as above, BUT can pass state as arg?
                 case 'T' : return state.hasAxe();
                 case 'a' : case 'k' : case 'd' : case '$' : return true; //pursue thorugh trees
+                default : return false;
+
+            }
+
+        }else{ //transitions
+
+            switch(c) {
+
+                case ' ' : return true;
+                case '*' : return false; //dont waste bombs getting somewhere
+                case '~' : return state.hasRaft(); 
+                case '-' : return state.hasKey(); 
+                case 'T' : return state.hasAxe();
+                case 'a' : case 'k' : case 'd' : case '$' : return true; 
                 default : return false;
 
             }

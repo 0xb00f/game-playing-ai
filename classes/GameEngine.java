@@ -95,9 +95,9 @@ public class GameEngine {
    private void print_map() throws InterruptedException {
       char ch=' ';
       int r,c;
-      System.out.print("\033\143"); //hack
       System.out.println();
-      Thread.sleep(10);
+      //Thread.sleep(50);
+      //System.out.print("\033\143"); //hack
       for( r=0; r < nrows; r++ ) {
          for( c=0; c < map[r].length; c++ ) {
             if(( r == row )&&( c == col )) { // agent is here

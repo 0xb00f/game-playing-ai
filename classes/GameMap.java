@@ -1,4 +1,5 @@
 import java.awt.Point;
+import java.util.Comparator;
 import java.util.LinkedList;
 
 public class GameMap {
@@ -162,9 +163,37 @@ public class GameMap {
 
     }
 
+    public boolean areAdjacent(GameNode a, GameNode b) {
+
+        return this.map.edgeExists(a, b);
+
+    }
+
     public GameNode findReachable(char target) { 
 
         return this.search.reachableItem(this, this.state, target);
+
+    }
+
+    public GameNode getNearest(LinkedList<GameNode> list) {
+
+        GameNode curr = this.state.getCurrNode();
+
+        list.sort(new Comparator<GameNode>() {
+            
+            public int compare(GameNode a, GameNode b) {
+
+                ManhattanDistanceHeuristic m = new ManhattanDistanceHeuristic();
+                Integer aDist = m.score(curr, a);
+                Integer bDist = m.score(curr, b);
+
+                return aDist.compareTo(bDist);
+
+            }
+
+        });
+
+        return list.getFirst();
 
     }
 

@@ -1,4 +1,3 @@
-import java.awt.Point;
 import java.util.ArrayDeque;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -21,41 +20,87 @@ public class SearchGameMap {
 
     public GameNode reachableItem(GameMap map, GameState state, char target) {
 
+        //System.out.println("FLOODFILL BEGIN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
         HashSet<GameNode> seen = new HashSet<GameNode>();
         ArrayDeque<GameNode> q = new ArrayDeque<GameNode>();
 
         q.push(this.state.getCurrNode());
+        seen.add(this.state.getCurrNode());
 
         while(!q.isEmpty()) {
 
             GameNode curr = q.poll();
-            seen.add(curr);
+            //System.out.println("FLOODFILL: visiting: '"+curr.getPoint().toString()+"'");
 
             if(curr.getType() == target) {
                 
-                if(!curr.isVisited() || curr == map.getHome()) {
+                //if(!curr.isVisited() || (state.hasTreasure() && curr == map.getHome())) { //too restrictive, cant get to water s0
+                    if(curr.getType() == ' ' || curr.getType() == '~') {
 
-                    return curr; //not visited in general, but especially for terrain
+                        if(!curr.isVisited()) return curr;
 
-                }
+                    }else{
+                    
+                        return curr; //not visited in general, but especially for terrain
+                    
+                    }
+
+                //}
             
             }
             
             for(GameNode next: map.getNeighbours(curr)) {
 
-                /*
-                 * separating the logic out in this guard:
-                 * seen - keeping track
-                 * gamenode - whether it is outofbounds
-                 * terrain - whether it is valid terrain for the agentstate
-                 */
-                if(seen.contains(next)) continue; // || next.outOfBounds(this.state)
-                if(!this.terrMngr.isValidTerrain(state, state.getAgentState(), next.getType())) {
-                    //System.out.println("FLOODFILL: terrain validity failed: '"+next.getType()+"'");
-                    continue;
-                }
+                if(seen.contains(next)) continue;
+                if(next.outOfBounds(this.state)) continue;
+                if(!this.terrMngr.isValidTerrain(state, state.getAgentState(), next.getType())) continue;
 
+                seen.add(next);
                 q.add(next);
+
+            }
+
+        }
+
+        return null;
+
+    }
+
+    public LinkedList<GameNode> bfs(GameMap map, GameNode start, GameNode end) {
+
+        ArrayDeque<GameNode> q = new ArrayDeque<GameNode>();
+        HashSet<GameNode> seen = new HashSet<GameNode>(); 
+        HashMap<GameNode,GameNode> prevs = new HashMap<GameNode,GameNode>();
+        
+        q.add(start);
+        seen.add(start);
+
+        while(!q.isEmpty()) {
+
+            GameNode curr = q.poll();
+
+            if(curr == end) {
+                LinkedList<GameNode> path = new LinkedList<GameNode>();
+                GameNode n = curr;
+                do {
+                    path.addFirst(n);
+                    n = prevs.get(n);
+                    //System.out.println("n is "+n.getPoint().toString());
+                } while(n != start);
+
+                return path;
+
+            }
+
+            for(GameNode n : map.getNeighbours(curr)) {
+
+                if(seen.contains(n) || n.outOfBounds(this.state)) continue;
+                if(!this.terrMngr.isValidTerrain(state, state.getAgentState(), n.getType())) continue;
+
+                prevs.put(n,curr); 
+                seen.add(n);
+                q.add(n);
 
             }
 
@@ -67,8 +112,13 @@ public class SearchGameMap {
 
     public LinkedList<GameNode> pathBFS(GameMap map, GameNode start, GameNode end) {
 
+        /*
+         * REVIEW THIS LOGIC
+         * -just path from A to B
+         */
+
         ArrayDeque<Goal> queue = new ArrayDeque<Goal>();
-        HashSet<Point> seen = new HashSet<Point>();  //change back
+        HashSet<GameNode> seen = new HashSet<GameNode>();  //change back
         Goal g = new Goal(start);
         queue.add(g);
 
@@ -76,8 +126,8 @@ public class SearchGameMap {
 
             Goal curr = queue.poll();
             GameNode currNode = curr.getGoalNode();
-            seen.add(currNode.getPoint());
-
+            seen.add(currNode);
+            System.out.println("BFS: visiting node of type '"+currNode.getType()+"' at "+currNode.getPoint().toString());
             if(currNode == end) {
 
                 return curr.getPath();
@@ -86,7 +136,7 @@ public class SearchGameMap {
 
             for(GameNode n : map.getNeighbours(currNode)) {
 
-                if(seen.contains(n.getPoint()) || n.outOfBounds(this.state) || !this.terrMngr.isValidTerrain(state, state.getAgentState(), n.getType())) continue; 
+                if(seen.contains(n) || n.outOfBounds(this.state) || !this.terrMngr.isValidTerrain(state, state.getAgentState(), n.getType())) continue; 
 
                 Goal next = new Goal(n);
                 next.extendPath(curr.getPath());
@@ -103,7 +153,10 @@ public class SearchGameMap {
 
     public Goal constructPath(GameMap map, LinkedList<GameNode> nodes) {
 
-        //still need to think about paths form nodes to themselves, be neat about constructing, check the logic
+        /*
+         * REVIEW THIS LOGIC
+         * -test adjacency?
+         */
 
         Goal g = new Goal(nodes.getLast());// get(nodes.size()-1));
         GameNode prev = nodes.remove(0);
@@ -113,7 +166,10 @@ public class SearchGameMap {
             GameNode curr = nodes.remove(0);
             subPath = this.pathBFS(map, prev, curr);
             //debug
-            if(subPath == null) continue; //this would mean its unreachable though..
+            if(subPath == null) {
+                System.out.println("SEARCH: construct path: subpath null!!");
+                continue; //this would mean its unreachable though..
+            }
             g.extendPath(subPath);
             prev = curr;
         }
@@ -122,7 +178,33 @@ public class SearchGameMap {
 
     }
 
+    public Goal makePath(GameMap map, LinkedList<GameNode> nodes) {
+
+        LinkedList<GameNode> path = new LinkedList<GameNode>();
+        for(int i=0; i < nodes.size()-1; i++) {
+
+            GameNode curr = nodes.get(i), next = nodes.get(i+1);
+            if(!map.areAdjacent(curr, next)) {
+                
+                path.addAll(this.bfs(map, curr, next));
+
+            }else{
+
+                path.add(next);
+
+            }
+
+        }
+
+        Goal g = new Goal(nodes.getLast());
+        g.extendPath(path);
+        return g;
+
+    }
+
     public Goal exploreDFS(GameMap map, char terrain) { 
+
+        //System.out.println("EXPLORING '"+terrain+"'");
 
         ArrayDeque<GameNode> stack = new ArrayDeque<GameNode>();
         HashSet<GameNode> seen = new HashSet<GameNode>(); 
@@ -152,7 +234,7 @@ public class SearchGameMap {
                         //System.out.println("SEARCH: terrain validity failed");
                         continue;
                     }
-
+                    //System.out.println("SEARCH: will visit node of type '"+n.getType()+"' at "+n.getPoint().toString());
                     stack.push(n);
 
                 }
@@ -161,7 +243,7 @@ public class SearchGameMap {
 
         }
 
-        return constructPath(map,toExplore);
+        return makePath(map, toExplore);//constructPath(map,toExplore);
 
     }
 
@@ -220,7 +302,7 @@ public class SearchGameMap {
             }
 
             // look at successors
-            for(GoalSearchState next: curr.genSuccessors(map)) {
+            for(GoalSearchState next: curr.genSuccessors(map,this.state,this.terrMngr)) {
 
                 int tmpF = curr.getG() + next.getNode().nodeWeight() + h.score(next.getNode(),end); //separate function once item logic in place...
                 

@@ -178,7 +178,7 @@ public class GoalSearchState {
 
     }
 
-    private boolean updateStateOnMove(GameNode next, GoalSearchState nextstate) { //edit
+    private boolean updateStateOnMove(GameNode next, GoalSearchState nextstate, GameState state, TerrainManager tmngr) { //edit
 
         switch(next.getType()) {
 
@@ -186,6 +186,11 @@ public class GoalSearchState {
             case 'k': nextstate.setKey(); return true;
             case 'd': nextstate.addBomb(); return true;
             case '*': 
+
+                if(!tmngr.isValidTerrain(state, state.getAgentState(), next.getType())) {
+                    System.out.println("GOALSTATE terr failed on '"+next.getType()+"' in "+state.getAgentState()+" and hasBomb="+state.hasBomb());
+                    return false;
+                }
 
                 if(nextstate.hasBomb()) {
                     nextstate.useBomb();
@@ -229,7 +234,7 @@ public class GoalSearchState {
 
     }
 
-    public LinkedList<GoalSearchState> genSuccessors(GameMap map) {
+    public LinkedList<GoalSearchState> genSuccessors(GameMap map, GameState state, TerrainManager tmngr) {
 
         LinkedList<GoalSearchState> ret = new LinkedList<GoalSearchState>();
         GameNode currNode = this.node;
@@ -239,7 +244,7 @@ public class GoalSearchState {
         //north
         GameNode north = m.getNorthNeighbour(currNode);
         GoalSearchState northState = new GoalSearchState(this, north);
-        if(north != null && updateStateOnMove(north,northState)) {
+        if(north != null && updateStateOnMove(north,northState,state,tmngr)) {
 
             northState.setG(this.gValue + north.nodeWeight()); //this si done in searchmap....
             ret.add(northState);
@@ -249,7 +254,7 @@ public class GoalSearchState {
         //south
         GameNode south = m.getSouthNeighbour(currNode);
         GoalSearchState southState = new GoalSearchState(this, south);
-        if(south != null && updateStateOnMove(south,southState)) {
+        if(south != null && updateStateOnMove(south,southState,state,tmngr)) {
 
             southState.setG(this.gValue + south.nodeWeight());
             ret.add(southState);
@@ -259,7 +264,7 @@ public class GoalSearchState {
         //east
         GameNode east = m.getEastNeighbour(currNode);
         GoalSearchState eastState = new GoalSearchState(this, east);
-        if(east != null && updateStateOnMove(east,eastState)) {
+        if(east != null && updateStateOnMove(east,eastState,state,tmngr)) {
 
             eastState.setG(this.gValue + east.nodeWeight());
             ret.add(eastState);
@@ -269,7 +274,7 @@ public class GoalSearchState {
         //west
         GameNode west = m.getWestNeighbour(currNode);
         GoalSearchState westState = new GoalSearchState(this, west);
-        if(west != null && updateStateOnMove(west,westState)) {
+        if(west != null && updateStateOnMove(west,westState,state,tmngr)) {
 
             westState.setG(this.gValue + west.nodeWeight());
             ret.add(westState);
