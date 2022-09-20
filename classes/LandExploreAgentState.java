@@ -10,13 +10,6 @@ public class LandExploreAgentState implements AgentState {
 
     public void doTask(char[][] view) {
 
-        /*
-         * HANGS HERE ON s9
-         * seems not to explore land again
-         * misses collecting bomb
-         * WTF is the loop>?? its in constrcutPath - review the logic
-         * BE AWARE GOAL PURSUIT CAN TAKE PLACE IN OTHER MODES
-         */
 
         System.out.println("IN LAND EXPLORE");
 

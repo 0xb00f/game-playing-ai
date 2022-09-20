@@ -48,19 +48,13 @@ public class SearchGameMap {
 
         }
 
-        System.out.print("!!!!WORTH EXPLORING? items="+nItems+" rafts="+nRafts+": ");
-
-        //this logic?
-        if(nRafts == 0) { //less or eq?
-
-            System.out.println("NOT WORTH IT");
+        if(nRafts == 0) { 
 
             for(GameNode n : seen) n.setVisited();
             return false;
 
         }
 
-        System.out.println("WORTH IT");
         return nRafts > nItems;
 
     }

@@ -18,7 +18,7 @@ public class TransitionToGoalPursuit implements AgentState {
     
             //floodfill find raft
             GameNode raftNode = this.agentEngine.findReachableNode('T');
-            //enqueue actions if found, otherwise PANIC - NO RAFT NO GOALS NO LAND
+
             if(raftNode == null) {
     
                 System.out.println("TRANSIITON GOAL: NO RAFT!");
@@ -31,7 +31,7 @@ public class TransitionToGoalPursuit implements AgentState {
 
             }
 
-        }else if(this.agentEngine.isOnWater()) { //else if on water? yes, go to land, dont pursue goals from water, but go to land NEAR THE GOAL
+        }else if(this.agentEngine.isOnWater()) { 
            
             System.out.println("TRANSIITON GOAL: GOING TO LAND");
     
@@ -39,8 +39,6 @@ public class TransitionToGoalPursuit implements AgentState {
             GameNode nextGoal = this.agentEngine.peekGoal();
             GameNode landNode = this.agentEngine.getToLand(nextGoal);
 
-            //if(landNode != null && !this.agentEngine.isWorthExploring(landNode)) return;
-            //or floodfill from goal??
             if(landNode != null) {
 
                 System.out.println("TRANSIITON GOAL: LAND FOUND!");
