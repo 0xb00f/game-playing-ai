@@ -18,10 +18,55 @@ public class SearchGameMap {
 
     }
 
-    public GameNode reachableItem(GameMap map, GameState state, char target) {
+    public boolean isWorthExploring(GameMap map, GameNode start) {
 
-        //System.out.println("FLOODFILL BEGIN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        HashSet<GameNode> seen = new HashSet<GameNode>();
+        ArrayDeque<GameNode> q = new ArrayDeque<GameNode>();
 
+        q.push(start);
+        seen.add(start);
+
+        int nItems = 0;
+        int nRafts = 0;
+
+        while(!q.isEmpty()) {
+
+            GameNode curr = q.poll();
+
+            if(curr.isItem()) nItems++;
+            if(curr.isTree()) nRafts++;
+            
+            for(GameNode next: map.getNeighbours(curr)) {
+
+                if(seen.contains(next)) continue;
+                if(next.outOfBounds(this.state) || next.getType() == '~') continue;
+
+                seen.add(next);
+                q.add(next);
+
+            }
+
+        }
+
+        System.out.print("!!!!WORTH EXPLORING? items="+nItems+" rafts="+nRafts+": ");
+
+        //this logic?
+        if(nRafts == 0) { //less or eq?
+
+            System.out.println("NOT WORTH IT");
+
+            for(GameNode n : seen) n.setVisited();
+            return false;
+
+        }
+
+        System.out.println("WORTH IT");
+        return nRafts > nItems;
+
+    }
+
+    public GameNode findUnexploredRegion(GameMap map, GameState state, char target) {
+        
         HashSet<GameNode> seen = new HashSet<GameNode>();
         ArrayDeque<GameNode> q = new ArrayDeque<GameNode>();
 
@@ -31,30 +76,45 @@ public class SearchGameMap {
         while(!q.isEmpty()) {
 
             GameNode curr = q.poll();
-            //System.out.println("FLOODFILL: visiting: '"+curr.getPoint().toString()+"'");
 
-            if(curr.getType() == target) {
-                
-                //if(!curr.isVisited() || (state.hasTreasure() && curr == map.getHome())) { //too restrictive, cant get to water s0
-                    if(curr.getType() == ' ' || curr.getType() == '~') {
+            if(curr.getType() == target && !curr.isVisited()) return curr;
 
-                        if(!curr.isVisited()) return curr;
-
-                    }else{
-                    
-                        return curr; //not visited in general, but especially for terrain
-                    
-                    }
-
-                //}
-            
-            }
-            
             for(GameNode next: map.getNeighbours(curr)) {
 
                 if(seen.contains(next)) continue;
                 if(next.outOfBounds(this.state)) continue;
                 if(!this.terrMngr.isValidTerrain(state, state.getAgentState(), next.getType())) continue;
+
+                seen.add(next);
+                q.add(next);
+
+            }
+
+        }
+
+        return null;
+
+    }
+
+    public GameNode reachableItem(GameNode start, GameMap map, GameState state, char target, boolean brute) {
+
+        HashSet<GameNode> seen = new HashSet<GameNode>();
+        ArrayDeque<GameNode> q = new ArrayDeque<GameNode>();
+
+        q.push(start);
+        seen.add(start);
+
+        while(!q.isEmpty()) {
+
+            GameNode curr = q.poll();
+
+            if(curr.getType() == target) return curr;
+            
+            for(GameNode next: map.getNeighbours(curr)) {
+
+                if(seen.contains(next)) continue;
+                if(!brute && next.outOfBounds(this.state)) continue;
+                if(!brute && !this.terrMngr.isValidTerrain(state, state.getAgentState(), next.getType())) continue;
 
                 seen.add(next);
                 q.add(next);
@@ -107,74 +167,6 @@ public class SearchGameMap {
         }
 
         return null;
-
-    }
-
-    public LinkedList<GameNode> pathBFS(GameMap map, GameNode start, GameNode end) {
-
-        /*
-         * REVIEW THIS LOGIC
-         * -just path from A to B
-         */
-
-        ArrayDeque<Goal> queue = new ArrayDeque<Goal>();
-        HashSet<GameNode> seen = new HashSet<GameNode>();  //change back
-        Goal g = new Goal(start);
-        queue.add(g);
-
-        while(!queue.isEmpty()) {
-
-            Goal curr = queue.poll();
-            GameNode currNode = curr.getGoalNode();
-            seen.add(currNode);
-            System.out.println("BFS: visiting node of type '"+currNode.getType()+"' at "+currNode.getPoint().toString());
-            if(currNode == end) {
-
-                return curr.getPath();
-
-            }
-
-            for(GameNode n : map.getNeighbours(currNode)) {
-
-                if(seen.contains(n) || n.outOfBounds(this.state) || !this.terrMngr.isValidTerrain(state, state.getAgentState(), n.getType())) continue; 
-
-                Goal next = new Goal(n);
-                next.extendPath(curr.getPath());
-                next.addToPath(n);
-                queue.add(next);
-
-            }
-
-        }
-
-        return null; //not reachable
-
-    }
-
-    public Goal constructPath(GameMap map, LinkedList<GameNode> nodes) {
-
-        /*
-         * REVIEW THIS LOGIC
-         * -test adjacency?
-         */
-
-        Goal g = new Goal(nodes.getLast());// get(nodes.size()-1));
-        GameNode prev = nodes.remove(0);
-        LinkedList<GameNode> subPath = null;
-
-        while(!nodes.isEmpty()) {
-            GameNode curr = nodes.remove(0);
-            subPath = this.pathBFS(map, prev, curr);
-            //debug
-            if(subPath == null) {
-                System.out.println("SEARCH: construct path: subpath null!!");
-                continue; //this would mean its unreachable though..
-            }
-            g.extendPath(subPath);
-            prev = curr;
-        }
-
-        return g;
 
     }
 
@@ -262,25 +254,25 @@ public class SearchGameMap {
 
     public Goal astarSearch(GameMap map, GameNode end, Heuristic h) {
 
-        System.out.println("ASTAR: start on goal with type '"+end.getType()+"' at "+end.getPoint().toString());
+        System.out.println("ASTAR: start at "+this.state.getCurrNode().getPoint().toString()+" on goal with type '"+end.getType()+"' at "+end.getPoint().toString());
 
         PriorityQueue<GoalSearchState> open = new PriorityQueue<GoalSearchState>(new GoalStateCompare());
-        HashSet<GameNode> closed = new HashSet<GameNode>();
+        HashSet<GameNode> closed = new HashSet<GameNode>(); //used??
         HashMap<GameNode,Integer> fValues = new HashMap<GameNode,Integer>();
 
         GameNode startNode = this.state.getCurrNode();
         GoalSearchState start = new GoalSearchState(null,startNode);
 
         start.initState(this.state); //initState
-        start.setG(startNode.nodeWeight());
+        start.setG(0); //startNode.getPathWeight()
         start.setH(h.score(startNode, end)); //this.state
         open.add(start);
-        fValues.put(start.getNode(),start.getG()+h.score(startNode, end));
+        fValues.put(start.getNode(),h.score(startNode, end));
 
         while(!open.isEmpty()) {
 
             GoalSearchState curr = open.poll();
-            closed.add(curr.getNode());
+            //closed.add(curr.getNode()); //used?
 
             // we're at the goal 
             if(curr.getNode() == end) {
@@ -304,13 +296,18 @@ public class SearchGameMap {
             // look at successors
             for(GoalSearchState next: curr.genSuccessors(map,this.state,this.terrMngr)) {
 
-                int tmpF = curr.getG() + next.getNode().nodeWeight() + h.score(next.getNode(),end); //separate function once item logic in place...
+                //if(closed.contains(next.getNode())) continue;
+
+                //try computing the below INSIDE goalstate...
+                int tmpF = curr.getG() + next.getNode().getPathWeight() + h.score(next.getNode(),end); //separate function once item logic in place...
                 
                 if(tmpF < fValues.getOrDefault(next.getNode(), Integer.MAX_VALUE)) {
-
-                    next.setG(curr.getG() + next.getNode().nodeWeight());
+                    
+                    //System.out.println("ASTAR: considering path to "+next.getNode().getPoint().toString()+" with g="+curr.getG()+" and next="+next.getNode().getPathWeight());
+                    next.setG(curr.getG() + next.getNode().getPathWeight());
                     next.setH(h.score(next.getNode(),end));
                     fValues.put(next.getNode(),tmpF);
+                    //closed.add(next.getNode()); //trial
                     open.add(next);
 
                 }

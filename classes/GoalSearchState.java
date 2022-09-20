@@ -15,6 +15,30 @@ public class GoalSearchState {
     private boolean onWater;
     private int nBombs;
 
+    /*
+      public GoalSearchState(GoalSearchState prev, GameNode node) {
+
+        this.prev = prev;
+        this.node = node;
+        this.hasTreasure = state.hasTreasure();
+        this.hasAxe = state.hasAxe();
+        this.hasKey = state.hasKey();
+        this.hasRaft = state.hasRaft();
+        this.onWater = state.isOnWater();
+        this.nBombs = state.getNumBombs();
+
+      }
+
+      public GoalSearchState(GameState state, GameNode node) {
+
+        this.prev = null;
+        this.node  = node;
+        //as above
+
+      }
+     
+     */
+
     public GoalSearchState(GoalSearchState prev, GameNode node) { //two constructors?
 
         this.prev = prev;
@@ -186,16 +210,19 @@ public class GoalSearchState {
             case 'k': nextstate.setKey(); return true;
             case 'd': nextstate.addBomb(); return true;
             case '*': 
+                //System.out.println("GOALSTATE: looking at bomb at "+next.getPoint().toString()+" with bombs="+nextstate.getNumBombs());
 
                 if(!tmngr.isValidTerrain(state, state.getAgentState(), next.getType())) {
-                    System.out.println("GOALSTATE terr failed on '"+next.getType()+"' in "+state.getAgentState()+" and hasBomb="+state.hasBomb());
+                    //System.out.println("GOALSTATE terr failed on '"+next.getType()+"' in "+state.getAgentState()+" and hasBomb="+state.hasBomb());
                     return false;
                 }
 
                 if(nextstate.hasBomb()) {
                     nextstate.useBomb();
+                    //System.out.println("GOALSTATE BOMB USE SUCCESS");
                     return true;
                 }else{
+                    //System.out.println("GOALSTATE BOMB USE FAIL");
                     return false;
                 }
 
@@ -243,41 +270,37 @@ public class GoalSearchState {
 
         //north
         GameNode north = m.getNorthNeighbour(currNode);
-        GoalSearchState northState = new GoalSearchState(this, north);
-        if(north != null && updateStateOnMove(north,northState,state,tmngr)) {
+        if(north != null) {
 
-            northState.setG(this.gValue + north.nodeWeight()); //this si done in searchmap....
-            ret.add(northState);
+            GoalSearchState northState = new GoalSearchState(this, north);
+            if(updateStateOnMove(north,northState,state,tmngr)) ret.add(northState);
 
         }
 
         //south
         GameNode south = m.getSouthNeighbour(currNode);
-        GoalSearchState southState = new GoalSearchState(this, south);
-        if(south != null && updateStateOnMove(south,southState,state,tmngr)) {
-
-            southState.setG(this.gValue + south.nodeWeight());
-            ret.add(southState);
+        if(south != null) {
+            
+            GoalSearchState southState = new GoalSearchState(this, south);
+            if(updateStateOnMove(south,southState,state,tmngr)) ret.add(southState);
 
         }
 
         //east
         GameNode east = m.getEastNeighbour(currNode);
-        GoalSearchState eastState = new GoalSearchState(this, east);
-        if(east != null && updateStateOnMove(east,eastState,state,tmngr)) {
-
-            eastState.setG(this.gValue + east.nodeWeight());
-            ret.add(eastState);
+        if(east != null ) {
+            
+            GoalSearchState eastState = new GoalSearchState(this, east);
+            if(updateStateOnMove(east,eastState,state,tmngr)) ret.add(eastState);
 
         }
 
         //west
         GameNode west = m.getWestNeighbour(currNode);
-        GoalSearchState westState = new GoalSearchState(this, west);
-        if(west != null && updateStateOnMove(west,westState,state,tmngr)) {
-
-            westState.setG(this.gValue + west.nodeWeight());
-            ret.add(westState);
+        if(west != null) {
+            
+            GoalSearchState westState = new GoalSearchState(this, west);
+            if(updateStateOnMove(west,westState,state,tmngr)) ret.add(westState);
 
         }
 

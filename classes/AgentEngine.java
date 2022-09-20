@@ -67,6 +67,18 @@ public class AgentEngine {
 
     }
 
+    public GameNode peekGoal() {
+
+        return this.goalMngr.getNextGoal();
+
+    }
+
+    public GameNode getToLand(GameNode start) {
+
+        return this.map.getToLand(start);
+
+    }
+
     public boolean pursueGoal() { 
 
         return this.goalMngr.pursueGoal(this.map,this.actions);
@@ -154,6 +166,21 @@ public class AgentEngine {
         }
 
     }
+
+    public boolean isWorthExploring(GameNode n) {
+
+        return this.map.isWorthExploring(n);
+
+    }
+
+    public GameNode findUnexploredRegion(char target) {
+
+        return this.map.findUnexploredRegion(target);
+
+    }
+
+
+
 
     public void addGoalActions(Goal g) { 
 

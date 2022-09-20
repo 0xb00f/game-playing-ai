@@ -5,12 +5,14 @@ public class GameNode {
     private Point pos;
     private char nodeType; 
     private boolean visited;
+    private int weight;
 
     public GameNode(int x, int y) {
 
         this.pos = new Point(x,y);
         this.nodeType = '.'; 
         this.visited = false;
+        this.weight = this.nodeWeight(); //default
 
     }
 
@@ -37,32 +39,42 @@ public class GameNode {
 
     }
 
-    public int nodeWeight() {
+    public int getPathWeight() { //to be used?
+
+        return this.weight;
+
+    }
+
+    public void setPathWeight(int w) { //to be used?
+
+        this.weight = w;
+
+    }
+
+    public int nodeWeight() { //for path weight default
 
         switch(this.nodeType) {
 
-            case '$' : return -5;
-            case 'a': case 'k': case 'd': return -1;
-            case ' ': return 1;
+            case '$' : case 'a': case 'k': case 'd': return 0; //negative weights bad idea!!!!!!!!!! fucks queue
+            case ' ': return 1; 
             case '~' : return 2;
             case 'T': return 3;
-            case '*': return 4;
+            case '*': return 8; //was 4
             default: return 100; //should never happen
 
         }
 
     }
 
-    public int goalWeight() {
+    public int goalWeight() { //for priority q
 
         switch(this.nodeType) {
 
             case ' ' : case '~' : case 'T' : return 0;
             case 'a': return 1;
-            //case 'T': return 2;
-            case 'k': return 3;
-            case 'd': return 4;
-            case '$': return 5; 
+            case 'k': return 2;
+            case 'd': return 3;
+            case '$': return 4; 
             default: return 100;
 
         }
@@ -99,6 +111,7 @@ public class GameNode {
     public void recordNode(char tile) { 
 
         this.nodeType = tile;
+        this.weight = this.nodeWeight(); //default
 
     }
 

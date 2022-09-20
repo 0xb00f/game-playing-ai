@@ -87,16 +87,77 @@ STEPS
 1. get graph working (DONE!)
 2. floodfill find reachable items (DONE!)
 3. state transitions (DONE! i think...)
-4. obstructions and terrain mngr
-5. goal state and search logic, dont need heuristics, clean up path logic....
+4. obstructions and terrain mngr (DONEish)
+5. goal state and search logic, dont need heuristics, clean up path logic.... (DONEish)
 6. add item scoring to astar f value calculations (separate function)
 
 TODO
 1. bomb goal logic...
 2. configure goalmngr for all goals
-3. 
+3. reevaluate astar logic...
+4. goals even needed??
 
 CURRENT ISSUES
--need good bomb logic to choose best bomb!! prototype in place...
--terrain mngr in goalstate stops using bombs unnecessarily in s7 but then it fails on s0 when finding reachbale water...
--need to make reachability more complicated (not visited for terrain...)
+-current problem with astar is it reaches the next node with no bombs....
+(subtracting numBombs fixes this but it blasts nonoptimal wall...)
+    -why does this happen?
+    -only if getting there without a bomb has a lower f-score than not using it...
+    -making bombs WAY more expensive works.... consider where a blasting is a massive shortcut and more expensive to go around
+
+
+-need good bomb logic to choose best bomb!! prototype in place for closest... think!!!!!!!!!!!!!!!!
+-need to make reachability more complicated (not visited for terrain...) seems ok, montior
+-goes straight for bombs in s7 and gets stuck without a raft... could sue a bomb but doesnt... wastes one anyway...
+-need a way of determining whether the agent will get stuck...
+    OR
+do astar using various heuristics and score them based on resultant states? deos that make sense?
+-dont pursue a goal when on water... going to land part of transition??
+
+-need to think about CHAINS of goals rather than goals themselves, YOU CAN GET A GOAL IN A WAY THAT MAKES ANOTHER GOAL OBTAINABLE
+- so not merely lowest cost path but optimal goal-seeking path.... function to score walls blown away??
+
+-dijkstra (or prims) shortest path BETWEEN GOALS with heuristics h1, h2, ... ,hn and the heuristic is the sum of these, where 
+if any are collected that h_i remains zero. Then if removing an obstacle along one of those paths reduces the cost along that
+path it is preferenced?? Or nodes laong that apth have lower cost.... algo assumes X bombs at the start...
+
+HOW CAN THIS BE DONE?
+
+-this logic applies mostly to s8 & s9. It concerns collecting bombs and choosing walls to blast while pursuing more bombs
+which eventually lead to the treasure. 
+-it needs to lead from bombs to the treasure, inclusive. 
+-to be compatible with other levels, this needs to kick in with a condition imposed by these levels (multiple bombs are head of the 
+queue?)
+-may need to update gamenode logic to account for mutable goal weights, add method for retrieving (in progress)
+
+so
+
+-when bomb(s) are the head of the queue we want to decide the best way of pursuing them en route to the treasure
+-analyse the bomb goals to find an optimal path between them, then recalc nodes weights on this path to make them attractive
+
+THIS BOMB LOGIC IS WHAT IS STANDING BETWEEN ME AND SUCCESS!!!! - also getting the goal on s7 from water...
+
+-could this be done with astar and a new heuristic?
+
+s7 ISSUES - goal state logic
+-gets stuck be cause it doesnt explore the land portion first
+-so dont be greedy, explore all land first before explore all alnd first nefore goals (water->land->goal)
+-SOLVED s7 BY CHANGING WATER EXPLORE LOGIC BUT FUCKS s4, s6 so must determine if gets STUCK!!!!!!!
+-determine the logic behind getting stuck....
+
+*BOMB LOGIC OVERVIEW
+use astar/dijkstra to find optimal path (BACKWARDS?) from treasure to all clustered bombs. Once this path is calculated
+then the cost of each node along the path is set to 0.
+
+This kicks in when the only goals left in the queue and bombs and teasure. This will only happen on s7-s9. It may happen on s6,s4 too
+but that shouldnt cause a problem. 
+
+THINK ABOUT STATES 
+
+*WATER EXPLORE
+-entering water explore we need a raft - DONE
+-leaving water explore we go not want to pursue a goal if there is new revealed land to explore....
+MUST not be a dead zone, and must not create a dead zone
+
+*GOAL PURSUIT
+-want to go to land first, but land NEAR THE GOAL
+

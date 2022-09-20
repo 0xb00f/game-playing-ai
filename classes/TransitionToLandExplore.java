@@ -14,7 +14,9 @@ public class TransitionToLandExplore implements AgentState {
 
         //if(this.agentEngine.isOnWater()) {
 
-            GameNode landNode = this.agentEngine.findReachableNode(' ');
+            GameNode landNode = this.agentEngine.findUnexploredRegion(' ');
+
+            if(landNode != null && !this.agentEngine.isWorthExploring(landNode)) return;
 
             if(landNode == null) { 
                 

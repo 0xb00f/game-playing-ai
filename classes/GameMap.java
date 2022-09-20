@@ -125,6 +125,8 @@ public class GameMap {
 
         }
 
+        //this.map.printGraph();
+
     }
 
     private Goal explore(char terrain) { //terrain redundant
@@ -171,11 +173,17 @@ public class GameMap {
 
     public GameNode findReachable(char target) { 
 
-        return this.search.reachableItem(this, this.state, target);
+        return this.search.reachableItem(this.state.getCurrNode(), this, this.state, target, false);
 
     }
 
-    public GameNode getNearest(LinkedList<GameNode> list) {
+    public GameNode getToLand(GameNode start) {
+
+        return this.search.reachableItem(start, this, this.state, ' ', true);
+
+    }
+
+    public GameNode getNearest(LinkedList<GameNode> list) { //temp?
 
         GameNode curr = this.state.getCurrNode();
 
@@ -202,5 +210,18 @@ public class GameMap {
         return this.map.getHomeNode();
 
     }
+
+    public boolean isWorthExploring(GameNode start) {
+
+        return this.search.isWorthExploring(this, start);
+
+    }
+
+    public GameNode findUnexploredRegion(char target) {
+
+        return this.search.findUnexploredRegion(this, this.state, target);
+
+    }
+
 
 }

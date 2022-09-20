@@ -114,7 +114,7 @@ public class AgentActions {
 
     }
 
-    public void goToGoal(Goal g) { //do prior sanity check to ensure all adjacent
+    public void goToGoal(Goal g) { //could jsut pass state?
 
         GameNode prev = this.state.getCurrNode();
         int vdir = this.state.getDirection();

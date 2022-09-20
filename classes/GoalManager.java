@@ -49,13 +49,13 @@ public class GoalManager {
 
     public GameNode getNextGoal() {
 
-        System.out.println("DEQUEUING GOAL '"+this.pendingGoals.peek().getType()+"'");
+        System.out.println("PEEKING GOAL '"+this.pendingGoals.peek().getType()+"'");
 
         return this.pendingGoals.peek(); //was poll... trialling new logic below removing only when success
 
     }
 
-    public GameNode pursueBomb(GameMap map) {
+    public GameNode pursueBomb(GameMap map) { //del
 
 
         LinkedList<GameNode> cands = new LinkedList<GameNode>();

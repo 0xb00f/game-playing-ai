@@ -12,7 +12,7 @@ public class GameState {
     private GameNode currentNode;
     private int currentDirection; // 0=north, 1=east, 2=south, 3=west
     private boolean onWater; //only relevant for terrain so shift there?
-    private AgentState currAgentState; //not needed?
+    private AgentState currAgentState; 
 
     private class GoalCompare implements Comparator<GameNode> {
 
@@ -177,7 +177,7 @@ public class GameState {
 
         }
 
-        if(node.isItem()) gmngr.removeGoal(node); //export
+        if(node.isItem()) gmngr.removeGoal(node); //export?
         if(node.getType() != '~') node.clearNode();
         node.setVisited();
 

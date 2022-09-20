@@ -30,7 +30,10 @@ public class GoalPursuitAgentState implements AgentState {
         if(!success){
 
             //first try land exploration
-            GameNode n = this.agentEngine.findReachableNode(' ');
+            GameNode n = this.agentEngine.findUnexploredRegion(' ');
+
+            //if(n != null && !this.agentEngine.isWorthExploring(n)) return;
+
             if(n != null) { 
                 
                 System.out.println("GOALPURSUIT: GOING INTO LAND EXPLORE");

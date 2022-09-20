@@ -38,7 +38,7 @@ public class TransitionToWaterExplore implements AgentState {
             System.out.println("TRANS WATER: GOING TO WATER");
 
             //floodfill find unexplored water
-            GameNode waterNode = this.agentEngine.findReachableNode('~');
+            GameNode waterNode = this.agentEngine.findUnexploredRegion('~');
             //enqueue actions if found otherwise panic
             if(waterNode == null) {
 

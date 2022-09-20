@@ -5,23 +5,21 @@ public class Goal {
     private int weight;
     private GameNode goalNode; 
     private LinkedList<GameNode> path;
-    private boolean crossWater; //del
 
     public Goal(GameNode n) {
 
         this.weight = this.calcWeight(n);
         this.goalNode = n;
         this.path = new LinkedList<GameNode>();
-        this.crossWater = false; //not needed
 
     }
 
     // THIS IS GOAL WEIGHT, NOT NODE WEIGHT
-    private int calcWeight(GameNode n) { //del?
+    private int calcWeight(GameNode n) { 
 
         switch(n.getType()) {
 
-            case ' ': return 1; //todo
+            case ' ': return 1; 
             case '~': return 2;
             case 'a': return 3;
             case 'T': return 4;
