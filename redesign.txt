@@ -161,3 +161,23 @@ MUST not be a dead zone, and must not create a dead zone
 *GOAL PURSUIT
 -want to go to land first, but land NEAR THE GOAL
 
+OK SO IT WINS FIRST 7!!!!!!!!!!
+
+need to think about bomb logic.....
+
+problems:
+-dont want to make an optimal path with bombs are separated by a large distance?? how to partition them?
+-have made astar logic different... can hopefully reuse this code.... will see if it does the trick
+-init this when only bombs and treasure are left....
+
+BOMB LOGIC AGAIN
+
+-when all that's left is bomb goals and the treasure, we activate the logic
+-order bombs in decreasing distance from the treasure
+-working backwards from the tresure we A* down the ordered list finding the optimal path from the treasure to
+the bombs (ignore all bombs greater than a distance of 4)
+
+ITS WINING 8 AND 9!!!!!!!!!!!! POC WORKS!! - increased wall weights
+-fails 6 and 7 though, as goal path is null in optimalPath (no raft, no key?, haphazard logic?)
+-HARD PART IS OVER JUST UPDATE LOGIC
+-and fix bomb++ hack

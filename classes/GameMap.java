@@ -153,9 +153,15 @@ public class GameMap {
 
     }
 
+    public Goal findOptimalPath(GameNode begin, GameNode end) { //?
+
+        return this.search.astarSearch(this, begin, end, new ManhattanDistanceHeuristic(),true);
+
+    }
+
     public Goal pursueGoal(GameNode n) {
 
-        return this.search.astarSearch(this, n, new ManhattanDistanceHeuristic());
+        return this.search.astarSearch(this, this.state.getCurrNode(), n, new ManhattanDistanceHeuristic(),false);
 
     }
 

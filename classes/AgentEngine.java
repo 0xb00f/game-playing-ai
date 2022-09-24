@@ -179,9 +179,6 @@ public class AgentEngine {
 
     }
 
-
-
-
     public void addGoalActions(Goal g) { 
 
         this.actions.goToGoal(g);

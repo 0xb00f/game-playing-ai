@@ -140,7 +140,6 @@ public class SearchGameMap {
                 do {
                     path.addFirst(n);
                     n = prevs.get(n);
-                    //System.out.println("n is "+n.getPoint().toString());
                 } while(n != start);
 
                 return path;
@@ -190,8 +189,6 @@ public class SearchGameMap {
 
     public Goal exploreDFS(GameMap map, char terrain) { 
 
-        //System.out.println("EXPLORING '"+terrain+"'");
-
         ArrayDeque<GameNode> stack = new ArrayDeque<GameNode>();
         HashSet<GameNode> seen = new HashSet<GameNode>(); 
         LinkedList<GameNode> toExplore = new LinkedList<GameNode>();
@@ -203,24 +200,19 @@ public class SearchGameMap {
 
             GameNode curr = stack.pop();
 
-            //System.out.println("EXPLORE GOING TO VISIT "+curr.getPoint().toString());
-
             if(!seen.contains(curr)) { 
 
                 seen.add(curr);
 
                 if(!curr.isVisited()) toExplore.add(curr); 
 
-                //System.out.println("curr has "+map.getNeighbours(curr).size()+" neighbours");
-
                 for(GameNode n : map.getNeighbours(curr)) {
 
                     if(seen.contains(n) || n.outOfBounds(this.state)) continue; 
                     if(!this.terrMngr.isValidTerrain(state, state.getAgentState(), n.getType())) {
-                        //System.out.println("SEARCH: terrain validity failed");
                         continue;
                     }
-                    //System.out.println("SEARCH: will visit node of type '"+n.getType()+"' at "+n.getPoint().toString());
+
                     stack.push(n);
 
                 }
@@ -229,7 +221,7 @@ public class SearchGameMap {
 
         }
 
-        return makePath(map, toExplore);//constructPath(map,toExplore);
+        return makePath(map, toExplore);
 
     }
 
@@ -246,20 +238,25 @@ public class SearchGameMap {
 
     }
 
-    public Goal astarSearch(GameMap map, GameNode end, Heuristic h) {
+    public Goal astarSearch(GameMap map, GameNode begin, GameNode end, Heuristic h, boolean bombPath) {
 
-        System.out.println("ASTAR: start at "+this.state.getCurrNode().getPoint().toString()+" on goal with type '"+end.getType()+"' at "+end.getPoint().toString());
+        System.out.println("ASTAR: start at "+begin.getPoint().toString()+" of type '"+begin.getType()+"' on goal with type '"+end.getType()+"' at "+end.getPoint().toString());
 
         PriorityQueue<GoalSearchState> open = new PriorityQueue<GoalSearchState>(new GoalStateCompare());
         HashSet<GameNode> closed = new HashSet<GameNode>(); //used??
         HashMap<GameNode,Integer> fValues = new HashMap<GameNode,Integer>();
 
-        GameNode startNode = this.state.getCurrNode();
+        GameNode startNode = begin;//this.state.getCurrNode();
         GoalSearchState start = new GoalSearchState(null,startNode);
 
         start.initState(this.state); //initState
         start.setG(0); //startNode.getPathWeight()
         start.setH(h.score(startNode, end)); //this.state
+        if(bombPath) {
+            start.addBomb(); //hack!!!!!!!!!!!!!! process each node INCLUDING the start
+            //start.setKey();
+            //start.setRaft(true);
+        }
         open.add(start);
         fValues.put(start.getNode(),h.score(startNode, end));
 

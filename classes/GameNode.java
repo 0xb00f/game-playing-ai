@@ -59,7 +59,7 @@ public class GameNode {
             case ' ': return 1; 
             case '~' : return 2;
             case 'T': return 3;
-            case '*': return 8; //was 4
+            case '*': return 16; //was 4
             default: return 100; //should never happen
 
         }

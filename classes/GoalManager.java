@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
@@ -55,7 +56,7 @@ public class GoalManager {
 
     }
 
-    public GameNode pursueBomb(GameMap map) { //del
+    public GameNode pursueBomb(GameMap map) { //well we do want the nearest....
 
 
         LinkedList<GameNode> cands = new LinkedList<GameNode>();
@@ -73,6 +74,59 @@ public class GoalManager {
         return best;
 
     }
+
+    public void findOptimalBombPath(GameMap map) {
+
+        
+        GameNode[] arr = this.pendingGoals.toArray(new GameNode[0]);
+        GameNode treasureNode = arr[arr.length-1];
+
+        Arrays.sort(arr, new Comparator<GameNode>() {
+            
+            public int compare(GameNode a, GameNode b) {
+
+                ManhattanDistanceHeuristic m = new ManhattanDistanceHeuristic();
+                Integer aDist = m.score(treasureNode, a);
+                Integer bDist = m.score(treasureNode, b);
+
+                return bDist.compareTo(aDist);
+
+            }
+
+        });
+
+        for(int i=0; i < arr.length-1; i++) {
+
+            GameNode curr = arr[i], next = arr[i+1];
+            Goal g = map.findOptimalPath(arr[i], arr[i+1]);
+
+            System.out.println("BOMB LOGIC: finding path from '"+curr.getType()+" at "+curr.getPoint().toString()+" to '"+next.getType()+"' at "+next.getPoint().toString());
+
+            if(g == null) return; 
+
+            for(GameNode n: g.getPath()) { 
+                n.setPathWeight(0);
+                //n.recordNode('X'); //testing
+            }
+
+        }
+
+        //for(int i=arr.length-1; i >= 0; i--) map.pursueGoal(arr[i]);
+
+    }
+
+    private boolean timeToOrderBombs() {
+
+        for(GameNode n : this.pendingGoals) {
+
+            if(n.getType() == '$' || n.getType() == 'd') continue;
+            return false;
+
+        }
+
+        return true;
+
+    }
     
     public boolean pursueGoal(GameMap map, AgentActions actions) { 
 
@@ -85,6 +139,11 @@ public class GoalManager {
 
             if(next.getType() == 'd') {
 
+                if(timeToOrderBombs()) {
+                    System.out.println("!!!!!!!!!!!!BOMB PATH TIME");
+                    findOptimalBombPath(map);
+                    //return true;
+                }
                 n = this.pursueBomb(map);
 
             }else {
@@ -92,15 +151,6 @@ public class GoalManager {
                 n = this.getNextGoal();
 
             }
-
-            /* 
-            if(map.findReachable(next.getType()) == null) { 
-                //System.out.println("GOAL OF TYPE '"+next.getType()+"' AT "+next.getPoint().toString()+" IS NOT REACHBLE!!!!!!!!!!!!!");
-                return false;    
-            }
-
-            n = this.getNextGoal();*/
-            //System.out.println("GOAL OF TYPE '"+n.getType()+"' AT "+n.getPoint().toString()+" IS REACHBLE");
 
         }
 
