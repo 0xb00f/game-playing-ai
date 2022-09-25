@@ -202,6 +202,67 @@ public class GoalSearchState {
 
     }
 
+    public void updateState() {
+
+        switch(this.node.getType()) {
+
+            case 'k': this.setKey(); break;
+            case 'd': this.addBomb(); break;
+            case '*': 
+
+                if(this.hasBomb()) {
+                    this.useBomb();
+                }
+                break;
+
+            case 'a': this.setAxe(); break;
+            case 'T': 
+                
+                if(this.hasAxe()) {
+                    this.setRaft(true); 
+                }
+                break;
+
+            case '~' : 
+
+                if(this.hasRaft()) {
+                    this.setOnWater();
+                }
+                break;
+
+            case ' ' : 
+
+                if(this.isOnWater()) {
+                    this.setRaft(false);
+                    this.setOffWater();
+                }
+                break;
+
+            case '$' : this.setTreasure(); 
+
+        }
+
+    }
+
+    private boolean validMove(GameState state, TerrainManager tmngr) {
+
+        switch(this.node.getType()) {
+
+            case '-': return this.hasKey();
+            case 'k': case 'd' : case 'a' : case ' ' : case '$' : return true;
+            case '*': 
+
+                if(!tmngr.isValidTerrain(state, state.getAgentState(), this.node.getType())) return false;
+                return this.hasBomb();
+
+            case 'T': return this.hasAxe;
+            case '~' : return this.hasRaft;
+            default : return false;
+
+        }
+
+    }
+
     private boolean updateStateOnMove(GameNode next, GoalSearchState nextstate, GameState state, TerrainManager tmngr) { //edit
 
         switch(next.getType()) {
@@ -273,7 +334,13 @@ public class GoalSearchState {
         if(north != null) {
 
             GoalSearchState northState = new GoalSearchState(this, north);
-            if(updateStateOnMove(north,northState,state,tmngr)) ret.add(northState);
+            
+            if(northState.validMove(state,tmngr)) {
+                northState.updateState();
+                ret.add(northState); 
+            }
+             
+            //if(updateStateOnMove(north,northState,state,tmngr)) ret.add(northState);
 
         }
 
@@ -282,7 +349,11 @@ public class GoalSearchState {
         if(south != null) {
             
             GoalSearchState southState = new GoalSearchState(this, south);
-            if(updateStateOnMove(south,southState,state,tmngr)) ret.add(southState);
+            if(southState.validMove(state,tmngr)) {
+                southState.updateState();
+                ret.add(southState); 
+            }
+            //if(updateStateOnMove(south,southState,state,tmngr)) ret.add(southState);
 
         }
 
@@ -291,7 +362,11 @@ public class GoalSearchState {
         if(east != null ) {
             
             GoalSearchState eastState = new GoalSearchState(this, east);
-            if(updateStateOnMove(east,eastState,state,tmngr)) ret.add(eastState);
+            if(eastState.validMove(state,tmngr)) {
+                eastState.updateState();
+                ret.add(eastState); 
+            }
+            //if(updateStateOnMove(east,eastState,state,tmngr)) ret.add(eastState);
 
         }
 
@@ -300,7 +375,11 @@ public class GoalSearchState {
         if(west != null) {
             
             GoalSearchState westState = new GoalSearchState(this, west);
-            if(updateStateOnMove(west,westState,state,tmngr)) ret.add(westState);
+            if(westState.validMove(state,tmngr)) {
+                westState.updateState();
+                ret.add(westState); 
+            }
+            //if(updateStateOnMove(west,westState,state,tmngr)) ret.add(westState);
 
         }
 

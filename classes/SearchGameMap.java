@@ -243,7 +243,7 @@ public class SearchGameMap {
         System.out.println("ASTAR: start at "+begin.getPoint().toString()+" of type '"+begin.getType()+"' on goal with type '"+end.getType()+"' at "+end.getPoint().toString());
 
         PriorityQueue<GoalSearchState> open = new PriorityQueue<GoalSearchState>(new GoalStateCompare());
-        HashSet<GameNode> closed = new HashSet<GameNode>(); //used??
+        //HashSet<GameNode> closed = new HashSet<GameNode>(); //used??
         HashMap<GameNode,Integer> fValues = new HashMap<GameNode,Integer>();
 
         GameNode startNode = begin;//this.state.getCurrNode();
@@ -252,11 +252,12 @@ public class SearchGameMap {
         start.initState(this.state); //initState
         start.setG(0); //startNode.getPathWeight()
         start.setH(h.score(startNode, end)); //this.state
-        if(bombPath) {
-            start.addBomb(); //hack!!!!!!!!!!!!!! process each node INCLUDING the start
+        start.updateState();
+        //if(bombPath) {
+            //start.addBomb(); //hack!!!!!!!!!!!!!! process each node INCLUDING the start
             //start.setKey();
             //start.setRaft(true);
-        }
+        //}
         open.add(start);
         fValues.put(start.getNode(),h.score(startNode, end));
 

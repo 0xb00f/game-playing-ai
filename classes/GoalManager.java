@@ -95,6 +95,9 @@ public class GoalManager {
 
         });
 
+        //this.pendingGoals.clear();
+        //this.pendingGoals.addAll(Arrays.asList(arr));
+
         for(int i=0; i < arr.length-1; i++) {
 
             GameNode curr = arr[i], next = arr[i+1];
@@ -106,12 +109,9 @@ public class GoalManager {
 
             for(GameNode n: g.getPath()) { 
                 n.setPathWeight(0);
-                //n.recordNode('X'); //testing
             }
 
         }
-
-        //for(int i=arr.length-1; i >= 0; i--) map.pursueGoal(arr[i]);
 
     }
 
