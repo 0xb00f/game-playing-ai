@@ -183,5 +183,5 @@ ITS WINING 8 AND 9!!!!!!!!!!!! POC WORKS!! - increased wall weights
 -and fix bomb++ hack
 
 CLEAN UPDATE
--nearest bomb or reorder pq?
--get rid goals
+-bomb logic and pq or leave well enough alone?
+-clean up heuristic usage

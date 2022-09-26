@@ -2,10 +2,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
+import java.util.Queue;
 
 public class GoalManager {
 
-    private PriorityQueue<GameNode> pendingGoals; 
+    private Queue<GameNode> pendingGoals; //was priority
 
     public GoalManager() {
 
@@ -55,8 +56,8 @@ public class GoalManager {
         return this.pendingGoals.peek(); 
 
     }
-
-    public GameNode pursueBomb(GameMap map) { //well we do want the nearest....
+    
+    public GameNode pursueBomb(GameMap map) { 
 
         LinkedList<GameNode> cands = new LinkedList<GameNode>();
 
@@ -71,7 +72,7 @@ public class GoalManager {
         return best;
 
     }
-
+    
     public void findOptimalBombPath(GameMap map) {
 
         
@@ -107,6 +108,8 @@ public class GoalManager {
 
         }
 
+        //this.pendingGoals = (Queue<GameNode>) Arrays.asList(arr);
+
     }
 
     private boolean timeToOrderBombs() {
@@ -128,13 +131,12 @@ public class GoalManager {
 
         if(this.hasGoal()) { 
         
-            //peek goal first see if next goal reachable...
             GameNode next = this.pendingGoals.peek();
 
             if(next.getType() == 'd') {
 
                 if(timeToOrderBombs()) {
-                    System.out.println("!!!!!!!!!!!!BOMB PATH TIME");
+                    //System.out.println("!!!!!!!!!!!!BOMB PATH TIME");
                     findOptimalBombPath(map);
                 }
                 n = this.pursueBomb(map);

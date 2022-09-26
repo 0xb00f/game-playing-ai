@@ -188,7 +188,7 @@ public class GameMap {
         return this.search.reachableItem(start, this, this.state, ' ', true);
 
     }
-
+    
     public GameNode getNearest(LinkedList<GameNode> list) { //temp?
 
         GameNode curr = this.state.getCurrNode();
@@ -210,7 +210,7 @@ public class GameMap {
         return list.getFirst();
 
     }
-
+    
     public GameNode getHome() {
 
         return this.map.getHomeNode();
