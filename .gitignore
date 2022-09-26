@@ -1,3 +1,7 @@
 oldproject/
+compiled/
 .vscode/
 redesign.txt
+Makefile
+build.sh
+

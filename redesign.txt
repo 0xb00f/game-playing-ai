@@ -181,3 +181,7 @@ ITS WINING 8 AND 9!!!!!!!!!!!! POC WORKS!! - increased wall weights
 -fails 6 and 7 though, as goal path is null in optimalPath (no raft, no key?, haphazard logic?)
 -HARD PART IS OVER JUST UPDATE LOGIC
 -and fix bomb++ hack
+
+CLEAN UPDATE
+-nearest bomb or reorder pq?
+-get rid goals

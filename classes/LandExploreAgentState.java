@@ -1,3 +1,5 @@
+import java.util.LinkedList;
+
 public class LandExploreAgentState implements AgentState {
     
     private AgentEngine agentEngine;
@@ -13,12 +15,12 @@ public class LandExploreAgentState implements AgentState {
 
         System.out.println("IN LAND EXPLORE");
 
-        Goal g = this.agentEngine.exploreLand(); 
+        LinkedList<GameNode> path = this.agentEngine.exploreLand(); 
 
-        if(g.hasPath()) {
+        if(path.size() > 0) {
 
             System.out.println("LANDEXP: GOAL HAS ACTIONS");
-            this.agentEngine.addGoalActions(g);
+            this.agentEngine.addGoalActions(path);
 
         }else if(this.agentEngine.hasGoal()) { 
 

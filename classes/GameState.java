@@ -1,9 +1,5 @@
-import java.util.Comparator;
-import java.util.PriorityQueue; 
-
 public class GameState { 
 
-    private PriorityQueue<GameNode> pendingGoals; //move to goalhandler
     private boolean axe;
     private boolean raft;
     private boolean key;
@@ -11,33 +7,19 @@ public class GameState {
     private int numBombs;
     private GameNode currentNode;
     private int currentDirection; // 0=north, 1=east, 2=south, 3=west
-    private boolean onWater; //only relevant for terrain so shift there?
+    private boolean onWater; 
     private AgentState currAgentState; 
-
-    private class GoalCompare implements Comparator<GameNode> {
-
-        public int compare(GameNode a, GameNode b) {
-    
-            Integer g1 = a.goalWeight();
-            Integer g2 = b.goalWeight();
-            
-            return g1.compareTo(g2);
-            
-        }
-
-    }
 
     public GameState(AgentState currState) {
 
-        this.pendingGoals = new PriorityQueue<GameNode>(new GoalCompare()); //move
         this.axe = false;
         this.raft = false;
         this.key = false;
         this.treasure = false;
         this.numBombs = 0;
-        this.currentNode = null; //new GameNode(0,0); // init currnode to start
+        this.currentNode = null; 
         this.currentDirection = 0; // north by default
-        this.currAgentState = currState; //needed? for terr decoupling
+        this.currAgentState = currState; 
 
     }
 
@@ -52,28 +34,20 @@ public class GameState {
         return this.currAgentState;
 
     }
-
-    public void addGoal(GameNode g) { //del
-
-        if(this.pendingGoals.contains(g)) return;
-
-        this.pendingGoals.add(g);
-
-    }
     
-    public boolean isOnWater() { //del
+    public boolean isOnWater() { 
 
         return this.onWater;
 
     }
 
-    public void setOnWater() { //del
+    public void setOnWater() { 
 
         this.onWater = true;
 
     }
 
-    public void setOffWater() { //del
+    public void setOffWater() { 
 
         this.onWater = false;
 
@@ -133,7 +107,7 @@ public class GameState {
 
     }
 
-    public int getNumBombs() { //del?
+    public int getNumBombs() { 
 
         return this.numBombs;
 
@@ -163,7 +137,7 @@ public class GameState {
 
     }
 
-    public void updateCurrState(GameMap map, GoalManager gmngr, GameNode node) { //keep here
+    public void updateCurrState(GameMap map, GoalManager gmngr, GameNode node) { 
 
         switch(node.getType()) {
 
@@ -177,7 +151,7 @@ public class GameState {
 
         }
 
-        if(node.isItem()) gmngr.removeGoal(node); //export?
+        if(node.isItem()) gmngr.removeGoal(node); 
         if(node.getType() != '~') node.clearNode();
         node.setVisited();
 

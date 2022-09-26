@@ -52,12 +52,11 @@ public class GoalManager {
 
         System.out.println("PEEKING GOAL '"+this.pendingGoals.peek().getType()+"'");
 
-        return this.pendingGoals.peek(); //was poll... trialling new logic below removing only when success
+        return this.pendingGoals.peek(); 
 
     }
 
     public GameNode pursueBomb(GameMap map) { //well we do want the nearest....
-
 
         LinkedList<GameNode> cands = new LinkedList<GameNode>();
 
@@ -67,9 +66,7 @@ public class GoalManager {
 
         }
 
-        //what do we want to do?? nearest reachable?
         GameNode best = map.getNearest(cands);
-        //this.pendingGoals.remove(best);
 
         return best;
 
@@ -95,19 +92,16 @@ public class GoalManager {
 
         });
 
-        //this.pendingGoals.clear();
-        //this.pendingGoals.addAll(Arrays.asList(arr));
-
         for(int i=0; i < arr.length-1; i++) {
 
             GameNode curr = arr[i], next = arr[i+1];
-            Goal g = map.findOptimalPath(arr[i], arr[i+1]);
+            LinkedList<GameNode> path = map.findOptimalPath(arr[i], arr[i+1]);
 
             System.out.println("BOMB LOGIC: finding path from '"+curr.getType()+" at "+curr.getPoint().toString()+" to '"+next.getType()+"' at "+next.getPoint().toString());
 
-            if(g == null) return; 
+            if(path == null) return; 
 
-            for(GameNode n: g.getPath()) { 
+            for(GameNode n: path) { 
                 n.setPathWeight(0);
             }
 
@@ -142,7 +136,6 @@ public class GoalManager {
                 if(timeToOrderBombs()) {
                     System.out.println("!!!!!!!!!!!!BOMB PATH TIME");
                     findOptimalBombPath(map);
-                    //return true;
                 }
                 n = this.pursueBomb(map);
 
@@ -156,11 +149,11 @@ public class GoalManager {
 
         if(n != null) {
 
-            Goal g = map.pursueGoal(n); 
+            LinkedList<GameNode> path = map.pursueGoal(n); 
 
-            if(g != null) {
+            if(path != null) {
 
-                actions.goToGoal(g); 
+                actions.goToGoal(path); 
                 this.pendingGoals.remove(n); //new
                 return true;
 

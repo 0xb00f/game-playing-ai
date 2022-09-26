@@ -1,3 +1,5 @@
+import java.util.LinkedList;
+
 public class WaterExploreAgentState implements AgentState {
 
     private AgentEngine agentEngine;
@@ -12,11 +14,11 @@ public class WaterExploreAgentState implements AgentState {
 
         System.out.println("IN WATER EXPLORE");
 
-        Goal g = this.agentEngine.exploreWater();
+        LinkedList<GameNode> path = this.agentEngine.exploreWater();
 
-        if(g.hasPath()) {
+        if(path.size() > 0) {
 
-            this.agentEngine.addGoalActions(g);
+            this.agentEngine.addGoalActions(path);
             return;
 
         }

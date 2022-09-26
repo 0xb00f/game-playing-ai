@@ -12,7 +12,7 @@ public class TerrainManager {
 
     }
 
-    public boolean isValidTerrain(GameState state, AgentState currState, char c) { //gamestate arg
+    public boolean isValidTerrain(GameState state, AgentState currState, char c) { 
 
         if(currState == this.landExplore) {
 
@@ -20,7 +20,7 @@ public class TerrainManager {
 
                 case ' ' : return true;
                 case '-' : return state.hasKey();
-                case 'a' : case 'k' : case 'd' : case '$' : return true; //T????????
+                case 'a' : case 'k' : case 'd' : case '$' : return true; 
                 default : return false;
 
             }
@@ -40,20 +40,20 @@ public class TerrainManager {
 
                 case ' ' : return true;
                 case '*' : return state.hasBomb();
-                case '~' : return state.hasRaft(); //kinda needed
-                case '-' : return state.hasKey(); //as above, BUT can pass state as arg?
+                case '~' : return state.hasRaft(); 
+                case '-' : return state.hasKey(); 
                 case 'T' : return state.hasAxe();
-                case 'a' : case 'k' : case 'd' : case '$' : return true; //pursue thorugh trees
+                case 'a' : case 'k' : case 'd' : case '$' : return true; 
                 default : return false;
 
             }
 
-        }else{ //transitions
+        }else{ 
 
             switch(c) {
 
                 case ' ' : return true;
-                case '*' : return false; //dont waste bombs getting somewhere
+                case '*' : return false; 
                 case '~' : return state.hasRaft(); 
                 case '-' : return state.hasKey(); 
                 case 'T' : return state.hasAxe();
@@ -66,18 +66,18 @@ public class TerrainManager {
 
     }
 
-    public void processTerrainChange(GameState state, GameNode curr, char nextTerrain) { //can pass state in to toggle things!!!!
+    public void processTerrainChange(GameState state, GameNode curr, char nextTerrain) {  //move to agentengine?
 
         char currTerrain = curr.getType();
 
         if(currTerrain == '~' && nextTerrain == ' ') { 
 
-            state.setRaft(false); //arg state
-            state.setOffWater(); //shifting onwater in here soon...
+            state.setRaft(false); 
+            state.setOffWater(); 
 
         }else if(currTerrain == ' ' && nextTerrain == '~') { 
 
-            state.setOnWater(); //as above
+            state.setOnWater(); 
             
         }
 

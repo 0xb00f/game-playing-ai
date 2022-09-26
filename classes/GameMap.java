@@ -7,14 +7,14 @@ public class GameMap {
     private Graph map;
     private SearchGameMap search;
     private GameState state;
-    private GoalManager goalMngr;
+    //private GoalManager goalMngr;
 
     public GameMap(GameState state, SearchGameMap search) {
 
         this.map = new Graph(); 
         this.state = state;
         this.search = search; //new SearchGameMap(state); //and terr, rethink construction sequence
-        this.goalMngr = null;
+        //this.goalMngr = null;
 
     }
 
@@ -109,7 +109,7 @@ public class GameMap {
 
                 this.map.connectNode(curr);
 
-                if(i==2 && j==2) { 
+                if(i==2 && j==2) { //currP.equals(this.state.getCurrPos)
 
                     this.state.updateCurrState(this,goalMngr,curr); 
 
@@ -129,7 +129,7 @@ public class GameMap {
 
     }
 
-    private Goal explore(char terrain) { //terrain redundant
+    private LinkedList<GameNode> explore(char terrain) { //terrain redundant
 
         return this.search.exploreDFS(this,terrain);
 
@@ -141,25 +141,25 @@ public class GameMap {
 
     }
 
-    public Goal exploreLand() { //redundant
+    public LinkedList<GameNode> exploreLand() { //redundant
 
         return this.explore(' ');
 
     }
 
-    public Goal exploreWater() { //redundant
+    public LinkedList<GameNode> exploreWater() { //redundant
 
         return this.explore('~');
 
     }
 
-    public Goal findOptimalPath(GameNode begin, GameNode end) { //?
+    public LinkedList<GameNode> findOptimalPath(GameNode begin, GameNode end) { //?
 
         return this.search.astarSearch(this, begin, end, new ManhattanDistanceHeuristic(),true);
 
     }
 
-    public Goal pursueGoal(GameNode n) {
+    public LinkedList<GameNode> pursueGoal(GameNode n) {
 
         return this.search.astarSearch(this, this.state.getCurrNode(), n, new ManhattanDistanceHeuristic(),false);
 

@@ -5,9 +5,7 @@ public class GoalSearchState {
     private GoalSearchState prev;
     private GameNode node;
     private int hValue; 
-    private int gValue; //path cost
-
-    //TO ADD - remove localstate
+    private int gValue; 
     private boolean hasTreasure;
     private boolean hasAxe;
     private boolean hasRaft;
@@ -15,10 +13,10 @@ public class GoalSearchState {
     private boolean onWater;
     private int nBombs;
 
-    /*
-      public GoalSearchState(GoalSearchState prev, GameNode node) {
 
-        this.prev = prev;
+    public GoalSearchState(GoalSearchState state, GameNode node) {
+
+        this.prev = state;
         this.node = node;
         this.hasTreasure = state.hasTreasure();
         this.hasAxe = state.hasAxe();
@@ -27,49 +25,21 @@ public class GoalSearchState {
         this.onWater = state.isOnWater();
         this.nBombs = state.getNumBombs();
 
-      }
+    }
 
-      public GoalSearchState(GameState state, GameNode node) {
+    public GoalSearchState(GameState state, GameNode node) {
 
         this.prev = null;
         this.node  = node;
-        //as above
+        this.hasTreasure = state.hasTreasure();
+        this.hasAxe = state.hasAxe();
+        this.hasKey = state.hasKey();
+        this.hasRaft = state.hasRaft();
+        this.onWater = state.isOnWater();
+        this.nBombs = state.getNumBombs();
 
-      }
+    }
      
-     */
-
-    public GoalSearchState(GoalSearchState prev, GameNode node) { //two constructors?
-
-        this.prev = prev;
-        this.node = node;
-
-        if(prev != null) this.setState(prev);
-
-    }
-
-    public void initState(GameState state) { //works initially but what about in searching???
-
-        this.hasTreasure = state.hasTreasure();
-        this.hasAxe = state.hasAxe();
-        this.hasKey = state.hasKey();
-        this.hasRaft = state.hasRaft();
-        this.onWater = state.isOnWater();
-        this.nBombs = state.getNumBombs();
-
-    }
-
-    public void setState(GoalSearchState state) { //above fix?
-
-        this.hasTreasure = state.hasTreasure();
-        this.hasAxe = state.hasAxe();
-        this.hasKey = state.hasKey();
-        this.hasRaft = state.hasRaft();
-        this.onWater = state.isOnWater();
-        this.nBombs = state.getNumBombs();
-
-    }
-
     public boolean hasAxe() {
 
         return this.hasAxe;
@@ -263,65 +233,6 @@ public class GoalSearchState {
 
     }
 
-    private boolean updateStateOnMove(GameNode next, GoalSearchState nextstate, GameState state, TerrainManager tmngr) { //edit
-
-        switch(next.getType()) {
-
-            case '-': return nextstate.hasKey();
-            case 'k': nextstate.setKey(); return true;
-            case 'd': nextstate.addBomb(); return true;
-            case '*': 
-                //System.out.println("GOALSTATE: looking at bomb at "+next.getPoint().toString()+" with bombs="+nextstate.getNumBombs());
-
-                if(!tmngr.isValidTerrain(state, state.getAgentState(), next.getType())) {
-                    //System.out.println("GOALSTATE terr failed on '"+next.getType()+"' in "+state.getAgentState()+" and hasBomb="+state.hasBomb());
-                    return false;
-                }
-
-                if(nextstate.hasBomb()) {
-                    nextstate.useBomb();
-                    //System.out.println("GOALSTATE BOMB USE SUCCESS");
-                    return true;
-                }else{
-                    //System.out.println("GOALSTATE BOMB USE FAIL");
-                    return false;
-                }
-
-            case 'a': nextstate.setAxe(); return true;
-            case 'T': 
-                
-                if(nextstate.hasAxe()) {
-                    nextstate.setRaft(true); 
-                    return true; //power through trees pursuing goal
-                }else{
-                    return false;
-                }
-
-            case '~' : 
-
-                if(nextstate.hasRaft()) {
-                    nextstate.setOnWater();
-                    return true;
-                }else{
-                    return false;
-                }
-
-            case ' ' : 
-
-                if(nextstate.isOnWater()) {
-                    nextstate.setRaft(false);
-                    nextstate.setOffWater();
-                }
-                return true; //if onwater, disable raft, return true
-
-            case '$' : nextstate.setTreasure(); return true;
-            default : return false;
-
-
-        }
-
-    }
-
     public LinkedList<GoalSearchState> genSuccessors(GameMap map, GameState state, TerrainManager tmngr) {
 
         LinkedList<GoalSearchState> ret = new LinkedList<GoalSearchState>();
@@ -329,7 +240,6 @@ public class GoalSearchState {
 
         Graph m = map.getMap();
 
-        //north
         GameNode north = m.getNorthNeighbour(currNode);
         if(north != null) {
 
@@ -340,11 +250,8 @@ public class GoalSearchState {
                 ret.add(northState); 
             }
              
-            //if(updateStateOnMove(north,northState,state,tmngr)) ret.add(northState);
-
         }
 
-        //south
         GameNode south = m.getSouthNeighbour(currNode);
         if(south != null) {
             
@@ -353,11 +260,9 @@ public class GoalSearchState {
                 southState.updateState();
                 ret.add(southState); 
             }
-            //if(updateStateOnMove(south,southState,state,tmngr)) ret.add(southState);
 
         }
 
-        //east
         GameNode east = m.getEastNeighbour(currNode);
         if(east != null ) {
             
@@ -366,11 +271,9 @@ public class GoalSearchState {
                 eastState.updateState();
                 ret.add(eastState); 
             }
-            //if(updateStateOnMove(east,eastState,state,tmngr)) ret.add(eastState);
 
         }
 
-        //west
         GameNode west = m.getWestNeighbour(currNode);
         if(west != null) {
             
@@ -379,7 +282,6 @@ public class GoalSearchState {
                 westState.updateState();
                 ret.add(westState); 
             }
-            //if(updateStateOnMove(west,westState,state,tmngr)) ret.add(westState);
 
         }
 

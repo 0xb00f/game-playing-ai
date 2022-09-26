@@ -1,5 +1,6 @@
 import java.awt.Point;
 import java.util.ArrayDeque;
+import java.util.LinkedList;
 
 public class AgentActions {
     
@@ -114,12 +115,12 @@ public class AgentActions {
 
     }
 
-    public void goToGoal(Goal g) { //could jsut pass state?
+    public void goToGoal(LinkedList<GameNode> path) { //could jsut pass state?
 
         GameNode prev = this.state.getCurrNode();
         int vdir = this.state.getDirection();
 
-        for(GameNode next : g.getPath()) { 
+        for(GameNode next : path) { 
 
             int nextDir = bearingFrom(prev,next);
             if(nextDir == -1) continue; //ought never to happen

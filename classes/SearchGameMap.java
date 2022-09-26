@@ -163,7 +163,7 @@ public class SearchGameMap {
 
     }
 
-    public Goal makePath(GameMap map, LinkedList<GameNode> nodes) {
+    public LinkedList<GameNode> makePath(GameMap map, LinkedList<GameNode> nodes) {
 
         LinkedList<GameNode> path = new LinkedList<GameNode>();
         for(int i=0; i < nodes.size()-1; i++) {
@@ -181,13 +181,13 @@ public class SearchGameMap {
 
         }
 
-        Goal g = new Goal(nodes.getLast());
-        g.extendPath(path);
-        return g;
+        //Goal g = new Goal(nodes.getLast());
+        //g.extendPath(path);
+        return path;//g;
 
     }
 
-    public Goal exploreDFS(GameMap map, char terrain) { 
+    public LinkedList<GameNode> exploreDFS(GameMap map, char terrain) { 
 
         ArrayDeque<GameNode> stack = new ArrayDeque<GameNode>();
         HashSet<GameNode> seen = new HashSet<GameNode>(); 
@@ -238,35 +238,25 @@ public class SearchGameMap {
 
     }
 
-    public Goal astarSearch(GameMap map, GameNode begin, GameNode end, Heuristic h, boolean bombPath) {
+    public LinkedList<GameNode> astarSearch(GameMap map, GameNode begin, GameNode end, Heuristic h, boolean bombPath) {
 
         System.out.println("ASTAR: start at "+begin.getPoint().toString()+" of type '"+begin.getType()+"' on goal with type '"+end.getType()+"' at "+end.getPoint().toString());
 
         PriorityQueue<GoalSearchState> open = new PriorityQueue<GoalSearchState>(new GoalStateCompare());
-        //HashSet<GameNode> closed = new HashSet<GameNode>(); //used??
         HashMap<GameNode,Integer> fValues = new HashMap<GameNode,Integer>();
 
-        GameNode startNode = begin;//this.state.getCurrNode();
-        GoalSearchState start = new GoalSearchState(null,startNode);
-
-        start.initState(this.state); //initState
-        start.setG(0); //startNode.getPathWeight()
-        start.setH(h.score(startNode, end)); //this.state
+        GoalSearchState start = new GoalSearchState(this.state,begin);
+        start.setG(0); 
+        start.setH(h.score(begin, end)); 
         start.updateState();
-        //if(bombPath) {
-            //start.addBomb(); //hack!!!!!!!!!!!!!! process each node INCLUDING the start
-            //start.setKey();
-            //start.setRaft(true);
-        //}
+
         open.add(start);
-        fValues.put(start.getNode(),h.score(startNode, end));
+        fValues.put(start.getNode(),h.score(begin, end));
 
         while(!open.isEmpty()) {
 
             GoalSearchState curr = open.poll();
-            //closed.add(curr.getNode()); //used?
 
-            // we're at the goal 
             if(curr.getNode() == end) {
                 
                 LinkedList<GameNode> path = new LinkedList<GameNode>();
@@ -279,27 +269,21 @@ public class SearchGameMap {
                 }
 
                 System.out.println("ASTAR SUCCESS");
-                Goal g = new Goal(end);
-                g.extendPath(path);
-                return g;
+                //Goal g = new Goal(end);
+                //g.extendPath(path);
+                return path;//g;
 
             }
 
-            // look at successors
             for(GoalSearchState next: curr.genSuccessors(map,this.state,this.terrMngr)) {
 
-                //if(closed.contains(next.getNode())) continue;
-
-                //try computing the below INSIDE goalstate...
-                int tmpF = curr.getG() + next.getNode().getPathWeight() + h.score(next.getNode(),end); //separate function once item logic in place...
+                int tmpF = curr.getG() + next.getNode().getPathWeight() + h.score(next.getNode(),end); 
                 
                 if(tmpF < fValues.getOrDefault(next.getNode(), Integer.MAX_VALUE)) {
                     
-                    //System.out.println("ASTAR: considering path to "+next.getNode().getPoint().toString()+" with g="+curr.getG()+" and next="+next.getNode().getPathWeight());
                     next.setG(curr.getG() + next.getNode().getPathWeight());
                     next.setH(h.score(next.getNode(),end));
                     fValues.put(next.getNode(),tmpF);
-                    //closed.add(next.getNode()); //trial
                     open.add(next);
 
                 }

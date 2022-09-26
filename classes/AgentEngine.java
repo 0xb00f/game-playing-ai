@@ -1,3 +1,5 @@
+import java.util.LinkedList;
+
 public class AgentEngine {
     
     public AgentState exploreLand;
@@ -37,9 +39,9 @@ public class AgentEngine {
 
         this.mapView(view);
 
-        if(!this.hasNextAction()) {
+        //if(!this.hasNextAction()) {
             while(!this.hasNextAction()) this.currentState.doTask(view);
-        }
+        //}
         
         Character c = this.actions.getNextAction();
         this.processAction(c);
@@ -103,13 +105,13 @@ public class AgentEngine {
 
     }
 
-    public Goal exploreLand() {
+    public LinkedList<GameNode> exploreLand() {
 
         return this.map.exploreLand();
 
     }
 
-    public Goal exploreWater() {
+    public LinkedList<GameNode> exploreWater() {
 
         return this.map.exploreWater();
 
@@ -179,9 +181,9 @@ public class AgentEngine {
 
     }
 
-    public void addGoalActions(Goal g) { 
+    public void addGoalActions(LinkedList<GameNode> path) { 
 
-        this.actions.goToGoal(g);
+        this.actions.goToGoal(path);
 
     }
 

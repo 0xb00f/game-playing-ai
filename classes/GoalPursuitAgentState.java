@@ -10,13 +10,6 @@ public class GoalPursuitAgentState implements AgentState {
 
     public void doTask(char[][] view) {
 
-        /*
-         * HANGS IN GOAL PURSUIT ON s7
-         * seems not to explore the whole land
-         * and doesnt see critical bomb,
-         * instead loops on unreachable one
-         */
-
         System.out.println("IN GOALPURSUIT");
         boolean success = false;
 
