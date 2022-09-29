@@ -240,8 +240,6 @@ public class SearchGameMap {
 
     public LinkedList<GameNode> astarSearch(GameMap map, GameNode begin, GameNode end, Heuristic h, boolean bombPath) {
 
-        System.out.println("ASTAR: start at "+begin.getPoint().toString()+" of type '"+begin.getType()+"' on goal with type '"+end.getType()+"' at "+end.getPoint().toString());
-
         PriorityQueue<GoalSearchState> open = new PriorityQueue<GoalSearchState>(new GoalStateCompare());
         HashMap<GameNode,Integer> fValues = new HashMap<GameNode,Integer>();
 
@@ -268,10 +266,7 @@ public class SearchGameMap {
 
                 }
 
-                System.out.println("ASTAR SUCCESS");
-                //Goal g = new Goal(end);
-                //g.extendPath(path);
-                return path;//g;
+                return path;
 
             }
 
@@ -292,7 +287,6 @@ public class SearchGameMap {
 
         }
 
-        System.out.println("ASTAR FAILED to go to '"+end.getType()+"'");
         return null; 
 
     }

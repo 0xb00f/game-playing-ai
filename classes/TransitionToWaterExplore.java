@@ -10,23 +10,17 @@ public class TransitionToWaterExplore implements AgentState {
 
     public void doTask(char[][] view) {
 
-        System.out.println("IN TRANSIITON TO WATER");
-
         if(!this.agentEngine.hasRaft()) {
-
-            System.out.println("IN TRANSIITON TO WATER: GETTING RAFT");
         
             //floodfill find raft
             GameNode raftNode = this.agentEngine.findReachableNode('T');
-            //enqueue actions if found, otherwise PANIC - NO RAFT NO GOALS NO LAND
-            if(raftNode == null) {
 
-                System.out.println("TRANSIITON WATER: PANIC - NO RAFT!");
+            if(raftNode == null) { //panic
+
                 System.exit(1);
 
             }
 
-            System.out.println("IN TRANSITION TO WATER: RAFT FOUND!");
             this.agentEngine.addGoal(raftNode);
             this.agentEngine.pursueGoal();
             return;
@@ -35,14 +29,11 @@ public class TransitionToWaterExplore implements AgentState {
 
         if(!this.agentEngine.isOnWater()) {
 
-            System.out.println("TRANS WATER: GOING TO WATER");
-
             //floodfill find unexplored water
             GameNode waterNode = this.agentEngine.findUnexploredRegion('~');
             //enqueue actions if found otherwise panic
             if(waterNode == null) {
 
-                System.out.println("TRANS WATER: PANIC - NO WATER!");
                 System.exit(1);
 
             }

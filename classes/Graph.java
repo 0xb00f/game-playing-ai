@@ -17,73 +17,7 @@ public class Graph {
         this.addNode(this.home);
 
     }
-    /* 
-    private class ySort implements Comparator<GameNode> {
-
-        public int compare(GameNode a, GameNode b) {
-
-            Integer pay = a.getPoint().y;
-            Integer pby = b.getPoint().y;
-            
-            int result = pay.compareTo(pby);
-
-            if(result != 0) return -result;
-
-            return result;
-
-        }
-
-    }
-
-    
-    private class xSort implements Comparator<GameNode> {
-
-        public int compare(GameNode a, GameNode b) {
-
-            Integer pax = a.getPoint().x;
-            Integer pbx = b.getPoint().x;
-            
-            return pax.compareTo(pbx);
-
-        }
-
-    }
-
-    public void printGraph() {
-
-        HashMap<Integer,LinkedList<GameNode>> pts = new HashMap<Integer,LinkedList<GameNode>>();
-        
-        for(GameNode n : this.graph.keySet()) {
-
-            if(!pts.containsKey(n.getPoint().y)) pts.put(n.getPoint().y, new LinkedList<GameNode>());
-            pts.get(n.getPoint().y).add(n);
-
-        }
-
-        LinkedList<Integer> ys = new LinkedList<Integer>(pts.keySet());
-
-        Collections.sort(ys, Collections.reverseOrder());
-
-        System.out.println("##########################");
-
-        for(Integer y : ys) {
-
-            LinkedList<GameNode> xs = pts.get(y);
-            Collections.sort(xs, new xSort());
-            for(GameNode x : pts.get(y)) {
-
-                System.out.print(x.getType());
-
-            }
-
-            System.out.println("");
-
-        }
-
-        System.out.println("##########################");
-
-    }
-    */
+ 
     public GameNode getHomeNode() {
 
         return this.home;

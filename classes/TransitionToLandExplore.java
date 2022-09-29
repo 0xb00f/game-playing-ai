@@ -10,15 +10,12 @@ public class TransitionToLandExplore implements AgentState {
     
     public void doTask(char[][] view) {
 
-        System.out.println("IN TRANSIITON TO LAND");
-
         GameNode landNode = this.agentEngine.findUnexploredRegion(' ');
 
         if(landNode != null && !this.agentEngine.isWorthExploring(landNode)) return;
 
-        if(landNode == null) { 
+        if(landNode == null) { //panic
             
-            System.out.println("TRANSIITON LAND: PANIC - NO LAND FOUND!");
             System.exit(1);
 
         }

@@ -2,11 +2,10 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
-import java.util.Queue;
 
 public class GoalManager {
 
-    private Queue<GameNode> pendingGoals; //was priority
+    private PriorityQueue<GameNode> pendingGoals; 
 
     public GoalManager() {
 
@@ -36,22 +35,17 @@ public class GoalManager {
     public void addGoal(GameNode n) {
 
         if(this.pendingGoals.contains(n)) return;
-        System.out.println("ADDING GOAL '"+n.getType()+"' at "+n.getPoint().toString());
         this.pendingGoals.add(n); 
 
     }
 
     public void removeGoal(GameNode n) {
 
-        System.out.println("REMOVING GOAL '"+n.getType()+"'");
-
         this.pendingGoals.remove(n);
 
     }
 
     public GameNode getNextGoal() {
-
-        System.out.println("PEEKING GOAL '"+this.pendingGoals.peek().getType()+"'");
 
         return this.pendingGoals.peek(); 
 
@@ -98,8 +92,6 @@ public class GoalManager {
             GameNode curr = arr[i], next = arr[i+1];
             LinkedList<GameNode> path = map.findOptimalPath(arr[i], arr[i+1]);
 
-            System.out.println("BOMB LOGIC: finding path from '"+curr.getType()+" at "+curr.getPoint().toString()+" to '"+next.getType()+"' at "+next.getPoint().toString());
-
             if(path == null) return; 
 
             for(GameNode n: path) { 
@@ -107,8 +99,6 @@ public class GoalManager {
             }
 
         }
-
-        //this.pendingGoals = (Queue<GameNode>) Arrays.asList(arr);
 
     }
 
@@ -135,10 +125,7 @@ public class GoalManager {
 
             if(next.getType() == 'd') {
 
-                if(timeToOrderBombs()) {
-                    //System.out.println("!!!!!!!!!!!!BOMB PATH TIME");
-                    findOptimalBombPath(map);
-                }
+                if(timeToOrderBombs()) findOptimalBombPath(map);
                 n = this.pursueBomb(map);
 
             }else {
@@ -156,13 +143,13 @@ public class GoalManager {
             if(path != null) {
 
                 actions.goToGoal(path); 
-                this.pendingGoals.remove(n); //new
+                this.pendingGoals.remove(n); 
                 return true;
 
             }
 
         }
-        System.out.println("MNGR: GOAL PURSUIT FAILED");
+
         return false;
 
     }
